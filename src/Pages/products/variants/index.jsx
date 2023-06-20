@@ -1,12 +1,14 @@
 import { CloseCircleOutlined, HomeOutlined } from "@ant-design/icons"
-import { Breadcrumb, Button, Popconfirm, Space, Table, message } from "antd"
+import { Breadcrumb, Button, Popconfirm, Space, Table, Tag, message } from "antd"
 import SearchInput from "../../../Components/AppSearch/SearchInput"
 import CreateBtn from "./components/createBtn"
 import { useState } from "react";
-import categoryData from './dummyData';
+import variantData from './dummyData';
 import EditModal, { EditButton } from "./components/editModal";
+import { colors } from "../../../colors";
 
-function ProductCategory() {
+
+function ProductVariants() {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editRecord, setEditRecord] = useState(null);
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -14,6 +16,24 @@ function ProductCategory() {
   const columns = [
     { title: "ID", dataIndex: "id", key: "id", responsive: ['sm'] },
     { title: "Name", dataIndex: "name", key: "name" },
+    {
+      title: "Variant Options", 
+      dataIndex: "options",
+      key: "options",
+      responsive: ['xl'],
+      width: 200,
+      render: (_, { options }) => (
+        <>
+          {options.map((tag) => {
+            return (
+              <Tag color={colors.green}  key={tag}>
+                {tag.toUpperCase()}
+              </Tag>
+            );
+          })}
+        </>
+      ),
+    },
     {
       title: "Actions",
       dataIndex: "actions",
@@ -43,15 +63,15 @@ function ProductCategory() {
   const handleSaveEdit = (values) => {
     console.log("Saved edited record:", values);
     setEditModalVisible(false);
-    message.success("Category edited successfully");
+    message.success("Variants edited successfully");
   };
 
   const handleDelete = (id) => {
-    message.success(`Category with ID ${id} deleted`);
+    message.success(`Variants with ID ${id} deleted`);
   };
 
   const handleCreate = () => {
-    message.success("New Category Added");
+    message.success("New Variants Added");
 
   };
   const filterTableData = (data, keyword) => {
@@ -66,7 +86,7 @@ function ProductCategory() {
     });
   };
 
-  const filteredData = filterTableData(categoryData, searchKeyword);
+  const filteredData = filterTableData(variantData, searchKeyword);
 
   return (
     <div>
@@ -107,4 +127,4 @@ function ProductCategory() {
   )
 }
 
-export default ProductCategory
+export default ProductVariants

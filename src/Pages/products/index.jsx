@@ -4,10 +4,10 @@ import { CloseCircleOutlined, HomeOutlined } from "@ant-design/icons";
 import CreateButton from "./components/createButton";
 import { useState } from "react";
 import EditModal, { EditButton } from "./components/editModal";
-import SearchInput from "./components/searchInput";
 import ViewButton from "./components/viewModal";
 import data from "./dummyData";
 import { colors } from "../../colors";
+import SearchInput from "../../Components/AppSearch/SearchInput";
 
 function ProductList() {
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -78,7 +78,7 @@ function ProductList() {
           <EditButton record={record} onEdit={handleEdit} />
           <Popconfirm
             title="Are you sure you want to delete this record?"
-            onConfirm={() => handleDelete(record.id)}
+            onConfirm={() => handleDelete(record.sku)}
             okText="Yes"
             cancelText="No"
             okType="default"
@@ -115,12 +115,13 @@ function ProductList() {
     message.success("Record edited successfully");
   };
 
-  const handleDelete = (id) => {
-    message.success(`Record with ID ${id} deleted`);
+  const handleDelete = (sku) => {
+    message.success(`Record with ${sku} deleted`);
   };
 
   const handleCreate = () => {
-    console.log("Create button clicked");
+    message.success("New Record Added");
+
   };
 
   return (

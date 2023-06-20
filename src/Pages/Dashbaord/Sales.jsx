@@ -25,7 +25,6 @@ function Attendance() {
       title: 'Payment Status',
       dataIndex: 'status',
       key: 'status',
-      responsive: ['lg'],
       render: (_, { status }) => (
         <>
           {status.map((tag) => {

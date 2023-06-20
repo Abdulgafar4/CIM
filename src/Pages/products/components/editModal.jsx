@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useEffect } from "react";
-import { Modal, Form, Input, Button, Select } from 'antd';
-import { EditOutlined } from "@ant-design/icons";
+import { Modal, Form, Input, Button, Select, Breadcrumb } from 'antd';
+import { EditOutlined, HomeOutlined } from "@ant-design/icons";
 
 export const EditButton = ({ record, onEdit }) => {
 
@@ -37,14 +37,31 @@ const EditModal = ({ record, visible, onCancel, onSave }) => {
   
     return (
       <Modal
-        title="Edit Record"
+      title={
+        <Breadcrumb
+            items={[
+                {
+                    href: "/",
+                    title: <HomeOutlined />,
+                },
+                {
+                    href: "/products",
+                    title: <span>Products List</span>,
+                },
+                {
+                    href: "",
+                    title: <span>Edit Product</span>
+                }
+            ]}
+        />
+    }
         open={visible}
         onCancel={onCancel}
         onOk={handleSave}
         okType="default"
         okText="Update"
       >
-        <Form form={form}>
+        <Form form={form} className='pt-5'>
         <Form.Item
             name="sku"
             label="SKU"

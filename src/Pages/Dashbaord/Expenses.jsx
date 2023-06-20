@@ -8,18 +8,17 @@ export default function Expenses() {
       dataIndex: 'date',
       key: 'date',
       render: (text) => <a href="/sales">{text}</a>,
+      responsive: ['sm'],
     },
     {
       title: 'Purpose',
       dataIndex: 'purpose',
       key: 'purpose',
-      responsive: ['sm'],
     },
     {
       title: 'Amount',
       dataIndex: 'amount',
       key: 'amount',
-      responsive: ['lg'],
     },
   ];
 

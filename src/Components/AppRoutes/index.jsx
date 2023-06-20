@@ -14,6 +14,7 @@ import Purchase from "../../Pages/purchases";
 import PurchaseReturn from "../../Pages/purchases/purchase_return";
 import Sales from "../../Pages/sales";
 import Dashboard from "../../Pages/Dashbaord";
+import ProductVariants from "../../Pages/products/variants";
 
 
 function AppRoutes() {
@@ -30,6 +31,7 @@ function AppRoutes() {
       <Route path="/suppliers" element={<Suppliers />} />
       <Route path="/products/brands" element={<ProductBrand />} />
       <Route path="/products/categories" element={<ProductCategories />} />
+      <Route path="/products/variants" element={<ProductVariants />} />
       <Route path="/products" element={<ProductList />} />
       <Route path="/purchase" element={<Purchase />} />
       <Route path="/purchase/purchase_return" element={<PurchaseReturn />} />

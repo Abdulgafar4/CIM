@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useState } from 'react';
-import { Button, Modal, Form, Input, Select } from 'antd';
-import { PlusCircleOutlined } from '@ant-design/icons';
+import { Button, Modal, Form, Input, Select, Breadcrumb } from 'antd';
+import { HomeOutlined, PlusCircleOutlined } from '@ant-design/icons';
 
 const CreateButton = ({ onCreate }) => {
   const [visible, setVisible] = useState(false);
@@ -22,14 +22,31 @@ const CreateButton = ({ onCreate }) => {
     <div style={{ marginBottom: 16 }}>
       <Button type='primary' className='bg-green-500 text-white' icon={<PlusCircleOutlined />} onClick={() => setVisible(true)}>Create</Button>
       <Modal
-        title="Create Record"
+        title={
+          <Breadcrumb
+              items={[
+                  {
+                      href: "/",
+                      title: <HomeOutlined />,
+                  },
+                  {
+                      href: "/products",
+                      title: <span>Products List</span>,
+                  },
+                  {
+                      href: "",
+                      title: <span>Create Product</span>
+                  }
+              ]}
+          />
+      }
         open={visible}
         onCancel={() => setVisible(false)}
         onOk={handleCreate}
         okType='default'
         okText="Save"
       >
-        <Form form={form}>
+        <Form form={form} className='pt-5'>
           <Form.Item
             name="sku"
             label="SKU"
@@ -61,7 +78,7 @@ const CreateButton = ({ onCreate }) => {
               style={{
                 width: '100%',
               }}
-              placeholder="Tags Mode"
+              placeholder="Select the Product Category"
 
             >
               <Option value="phone">Phone</Option>
@@ -74,7 +91,18 @@ const CreateButton = ({ onCreate }) => {
             label="Brand"
             rules={[{ required: true, message: 'Brand name can not be empty' }]}
           >
-            <Input />
+            <Select
+              mode="tags"
+              style={{
+                width: '100%',
+              }}
+              placeholder="Select Brand"
+
+            >
+              <Option value="phone">Tecno</Option>
+              <Option value="charger">Nokia</Option>
+              <Option value="powerbank">Samsung</Option>
+            </Select>
           </Form.Item>
           <Form.Item
             name="quantity"
@@ -93,7 +121,7 @@ const CreateButton = ({ onCreate }) => {
               style={{
                 width: '100%',
               }}
-              placeholder="Tags Mode"
+              placeholder="Select the Variants"
 
             >
               <Option value="red">Red</Option>

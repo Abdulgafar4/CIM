@@ -28,6 +28,7 @@ function getItem(label, key, icon, children) {
         getItem("Products", "/products"),
         getItem("Brand", "/products/brands"),
         getItem("Categories", "/products/categories"),
+        getItem("Variants", "/products/variants"),
     ]),
     getItem('Sales', '/sales', <MdOutlineSell />),
     getItem('Purchase', '/purchase', <BsMinecartLoaded />),
