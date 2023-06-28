@@ -69,7 +69,7 @@ function SideBar(props) {
         breakpoint="md"
         theme="light"
       >
-        <div className="flex justify-center mt-7 cursor-pointer text-xl text-gray-400">
+        <div className="flex justify-center mt-7 cursor-pointer text-xl text-green-500">
           CIM
         </div>
         <Menu style={{ minHeight: '100vh' }}

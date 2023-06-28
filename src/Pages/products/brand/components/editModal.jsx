@@ -1,69 +1,66 @@
 /* eslint-disable react/prop-types */
 import { EditOutlined, HomeOutlined } from "@ant-design/icons";
-import { Breadcrumb, Button, Form, Input, Modal } from "antd";
-import { useEffect } from "react";
+import { Breadcrumb, Button, Form, Input, Modal, message } from "antd";
+import { useContext, useState } from "react";
+import { db } from "../../../../config/firebase";
+import { doc, updateDoc } from "firebase/firestore";
+import { AuthContext } from "../../../../context/AuthContext";
 
+  const EditModal = ({ record }) => {
+  const [visible, setVisible] = useState(false);
+  const { currentUser } = useContext(AuthContext);
 
-export const EditButton = ({ record, onEdit }) => {
+  const userId = currentUser.uid;
 
-    const handleEditClick = () => {
-      onEdit(record);
-    };
-  
-    return (
-      <Button icon={<EditOutlined />} onClick={handleEditClick} />
-    );
-  };
-
-  const EditModal = ({ record, visible, onCancel, onSave }) => {
       const [form] = Form.useForm();
     
-      const handleSave = () => {
-        form.validateFields().then(values => {
-          onSave(values);
-          form.resetFields();
-          onCancel();
-        });
-        
-      };
-    
-      useEffect(() => {
-        if (record) {
-          form.setFieldsValue(record);
-        }
-      }, [record, form]);
+        const handleSave = () => {
+          form.validateFields().then((values) => {
+            const documentId = values.id; 
+            delete values.id;
+
+            updateDoc(doc(db, `users/${userId}/productBrand`, documentId.toString()), values)
+              .then(() => {
+                form.resetFields();
+                message.success('Brand updated successfully');
+                setVisible(false)
+                window.location.reload();
+              })
+              .catch((error) => {
+                message.error(error.code);
+              });
+          });
+        };
     
       return (
+        <>
+        <Button icon={<EditOutlined />} onClick={() => setVisible(true)}  />
         <Modal
-        title={
-          <Breadcrumb
-              items={[
-                  {
-                      href: "/",
-                      title: <HomeOutlined />,
-                  },
-                  {
-                      href: "",
-                      title: <span>Product Brands</span>,
-                  },
-                  {
-                      href: "",
-                      title: <span>Edit Brand</span>
-                  }
-              ]}
-          />
-      }
+          title={<Breadcrumb
+            items={[
+              {
+                href: "/",
+                title: <HomeOutlined />,
+              },
+              {
+                href: "",
+                title: <span>Product Brands</span>,
+              },
+              {
+                href: "",
+                title: <span>Edit Brand</span>
+              }
+            ]} />}
           open={visible}
-          onCancel={onCancel}
+          onCancel={() => setVisible(false)}
           onOk={handleSave}
           okType="default"
           okText="Update"
         >
-          <Form form={form} className='pt-5'>
-          <Form.Item
+          <Form form={form} className='pt-5' initialValues={record}>
+            <Form.Item
               name="id"
               label="ID"
-              rules={[{ required: true, message: 'ID can not be empty' }]}
             >
               <Input disabled />
             </Form.Item>
@@ -76,6 +73,7 @@ export const EditButton = ({ record, onEdit }) => {
             </Form.Item>
           </Form>
         </Modal>
+        </>
       );
     };
     

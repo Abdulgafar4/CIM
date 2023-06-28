@@ -1,120 +1,77 @@
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable react/prop-types */
 import {
-  BellFilled,
-  MailOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import {
-  Badge,
+  Avatar,
   Button,
-  Drawer,
-  Image,
-  List,
-  Space,
-  Typography,
+  Popover,
   theme,
 } from "antd";
-import { useEffect, useState } from "react";
-import { getComments, getOrders } from "../../API";
+import { signOut } from "firebase/auth";
+import { auth } from "../../config/firebase";
+import { useContext, useState } from "react";
+import { AuthContext } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+
 
 function AppHeader(props) {
-  const [comments, setComments] = useState([]);
-  const [orders, setOrders] = useState([]);
-  const [commentsOpen, setCommentsOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
 
   const { collapsed, setCollapsed } = props;
+  const { dispatch } = useContext(AuthContext)
+  const navigate = useNavigate()
+  const [open, setOpen] = useState(false);
+
+
+  const handleOpenChange = (newOpen) => {
+    setOpen(newOpen);
+  };
 
   const {
     token: { colorBgContainer },
   } = theme.useToken();
 
-  useEffect(() => {
-    getComments().then((res) => {
-      setComments(res.comments);
+  const handleSignOut = () => {
+    signOut(auth).then(() => {
+      dispatch({ type: "LOGOUT" })
+      navigate("/auth")
+    }).catch((error) => {
+      console.log(error)
     });
-    getOrders().then((res) => {
-      setOrders(res.products);
-    });
-  }, []);
+    setOpen(false)
+  }
+
+  const {currentUser} = useContext(AuthContext)
+
+
+
+  const content = (
+    <div >
+      <p className=" cursor-pointer" onClick={handleSignOut}>Logout</p>
+    </div>
+  );
 
   return (
     <div
       style={{ background: colorBgContainer }}
-      className="flex flex-row justify-between items-center px-4 py-2"
+      className={`${currentUser ? "flex flex-row justify-between items-center px-4 py-2" : "hidden"}`}
     >
-      <div className="flex items-center">
-        <Button
-          type="text"
-          icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-          onClick={() => setCollapsed(!collapsed)}
-          style={{
-            fontSize: "16px",
-            width: 64,
-            height: 64,
-          }}
-        />
-        <Image
-          width={40}
-          src="https://yt3.ggpht.com/ytc/AMLnZu83ghQ28n1SqADR-RbI2BGYTrqqThAtJbfv9jcq=s176-c-k-c0x00ffffff-no-rj"
-        />
-      </div>
-      <Typography.Title />
-      <Space>
-        <Badge count={comments.length} dot>
-          <MailOutlined
-            style={{ fontSize: 24 }}
-            onClick={() => {
-              setCommentsOpen(true);
-            }}
-          />
-        </Badge>
-        <Badge count={orders.length}>
-          <BellFilled
-            style={{ fontSize: 24 }}
-            onClick={() => {
-              setNotificationsOpen(true);
-            }}
-          />
-        </Badge>
-      </Space>
-      <Drawer
-        title="Comments"
-        open={commentsOpen}
-        onClose={() => {
-          setCommentsOpen(false);
+      <Button
+        type="text"
+        icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+        onClick={() => setCollapsed(!collapsed)}
+        style={{
+          fontSize: "16px",
+          width: 64,
+          height: 64,
         }}
-        maskClosable
-      >
-        <List
-          dataSource={comments}
-          renderItem={(item) => {
-            return <List.Item>{item.body}</List.Item>;
-          }}
-        ></List>
-      </Drawer>
-      <Drawer
-        title="Notifications"
-        open={notificationsOpen}
-        onClose={() => {
-          setNotificationsOpen(false);
-        }}
-        maskClosable
-      >
-        <List
-          dataSource={orders}
-          renderItem={(item) => {
-            return (
-              <List.Item>
-                <Typography.Text strong>{item.title}</Typography.Text> has been
-                ordered!
-              </List.Item>
-            );
-          }}
-        ></List>
-      </Drawer>
+      />
+      <Popover content={content} trigger="click" open={open} onOpenChange={handleOpenChange}>
+        <Avatar className=" cursor-pointer" style={{ backgroundColor: '#87d068' }} icon={<UserOutlined />} />
+      </Popover>
     </div>
   );
 }

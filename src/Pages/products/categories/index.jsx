@@ -2,14 +2,36 @@ import { CloseCircleOutlined, HomeOutlined } from "@ant-design/icons"
 import { Breadcrumb, Button, Popconfirm, Space, Table, message } from "antd"
 import SearchInput from "../../../Components/AppSearch/SearchInput"
 import CreateBtn from "./components/createBtn"
-import { useState } from "react";
-import categoryData from './dummyData';
-import EditModal, { EditButton } from "./components/editModal";
+import { useContext, useEffect, useState } from "react";
+import EditModal from "./components/editModal";
+import { AuthContext } from "../../../context/AuthContext";
+import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
+import { db } from "../../../config/firebase";
 
 function ProductCategory() {
-  const [editModalVisible, setEditModalVisible] = useState(false);
-  const [editRecord, setEditRecord] = useState(null);
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState([]);
+  const { currentUser } = useContext(AuthContext);
+  const userId = currentUser.uid;
+
+  useEffect(() => {
+    setLoading(true)
+    const fetchData = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, `users/${userId}/productCategory`));
+        const fetchedData = querySnapshot.docs.map((doc) => ({
+          ...doc.data(),
+        }));
+        setData(fetchedData);
+        setLoading(false)
+      } catch (error) {
+        message.error(error.code);
+      }
+    };
+
+    fetchData();
+  }, [userId]);
 
   const columns = [
     { title: "ID", dataIndex: "id", key: "id", responsive: ['sm'] },
@@ -20,7 +42,7 @@ function ProductCategory() {
       key: "actions",
       render: (_, record) => (
         <Space size="small">
-          <EditButton record={record} onEdit={handleEdit} />
+          <EditModal record={record}  />
           <Popconfirm
             title="Are you sure you want to delete this record?"
             onConfirm={() => handleDelete(record.id)}
@@ -35,25 +57,17 @@ function ProductCategory() {
     },
   ]
 
-  const handleEdit = (record) => {
-    setEditRecord(record);
-    setEditModalVisible(true);
+  const handleDelete = async (id) => {
+    try {
+      const docRef = doc(db, `users/${userId}/productCategory/${id.toString()}`);
+      await deleteDoc(docRef);
+      message.success('Category deleted successfully');
+      window.location.reload();
+    } catch (error) {
+      message.error(error.code);
+    }
   };
 
-  const handleSaveEdit = (values) => {
-    console.log("Saved edited record:", values);
-    setEditModalVisible(false);
-    message.success("Category edited successfully");
-  };
-
-  const handleDelete = (id) => {
-    message.success(`Category with ID ${id} deleted`);
-  };
-
-  const handleCreate = () => {
-    message.success("New Category Added");
-
-  };
   const filterTableData = (data, keyword) => {
     if (!keyword) {
       return data;
@@ -66,16 +80,10 @@ function ProductCategory() {
     });
   };
 
-  const filteredData = filterTableData(categoryData, searchKeyword);
+  const filteredData = filterTableData(data, searchKeyword);
 
   return (
     <div>
-      <EditModal
-        record={editRecord}
-        visible={editModalVisible}
-        onCancel={() => setEditModalVisible(false)}
-        onSave={handleSaveEdit}
-      />
       <Breadcrumb
         items={[
           {
@@ -95,13 +103,14 @@ function ProductCategory() {
       />
       <div className="flex flex-row justify-between pt-8">
       <SearchInput setSearchKeyword={setSearchKeyword} />
-      <CreateBtn onCreate={handleCreate} />
+      <CreateBtn />
       </div>
       <Table
         dataSource={filteredData}
         columns={columns}
         bordered
         pagination={true}
+        loading={loading}
       />
     </div>
   )

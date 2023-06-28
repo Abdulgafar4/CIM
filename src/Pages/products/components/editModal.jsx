@@ -1,73 +1,83 @@
 /* eslint-disable react/prop-types */
-import { useEffect } from "react";
-import { Modal, Form, Input, Button, Select, Breadcrumb } from 'antd';
+import { Modal, Form, Input, Button, Select, Breadcrumb, message } from 'antd';
 import { EditOutlined, HomeOutlined } from "@ant-design/icons";
+import { useContext, useState } from 'react';
+import { AuthContext } from '../../../context/AuthContext';
+import { db } from '../../../config/firebase';
+import { doc, updateDoc } from 'firebase/firestore';
 
-export const EditButton = ({ record, onEdit }) => {
-
-  const handleEditClick = () => {
-    onEdit(record);
-  };
-
-  return (
-    <Button icon={<EditOutlined />} onClick={handleEditClick} />
-  );
-};
-
-
-const EditModal = ({ record, visible, onCancel, onSave }) => {
+const EditModal = ({ record }) => {
   const { Option } = Select;
   const { TextArea } = Input;
-    const [form] = Form.useForm();
-  
-    const handleSave = () => {
-      form.validateFields().then(values => {
-        onSave(values);
-        form.resetFields();
-        onCancel();
-      });
-      
-    };
-  
-    useEffect(() => {
-      if (record) {
-        form.setFieldsValue(record);
-      }
-    }, [record, form]);
-  
-    return (
+  const [form] = Form.useForm();
+  const [visible, setVisible] = useState(false);
+  const { currentUser } = useContext(AuthContext);
+
+  const userId = currentUser.uid;
+
+
+  const handleSave = () => {
+    form.validateFields().then((values) => {
+      const documentId = values.id;
+      delete values.id;
+
+      updateDoc(doc(db, `users/${userId}/product`, documentId.toString()), values)
+        .then(() => {
+          form.resetFields();
+          message.success('Product updated successfully');
+          setVisible(false)
+          window.location.reload();
+        })
+        .catch((error) => {
+          message.error(error.code);
+        });
+    });
+  };
+
+
+  return (
+    <>
+      <Button icon={<EditOutlined />} onClick={() => setVisible(true)} />
+
       <Modal
-      title={
-        <Breadcrumb
+        title={
+          <Breadcrumb
             items={[
-                {
-                    href: "/",
-                    title: <HomeOutlined />,
-                },
-                {
-                    href: "/products",
-                    title: <span>Products List</span>,
-                },
-                {
-                    href: "",
-                    title: <span>Edit Product</span>
-                }
+              {
+                href: "/",
+                title: <HomeOutlined />,
+              },
+              {
+                href: "/products",
+                title: <span>Products List</span>,
+              },
+              {
+                href: "",
+                title: <span>Edit Product</span>
+              }
             ]}
-        />
-    }
+          />
+        }
         open={visible}
-        onCancel={onCancel}
+        onCancel={() => setVisible(false)}
         onOk={handleSave}
         okType="default"
         okText="Update"
       >
-        <Form form={form} className='pt-5'>
-        <Form.Item
+        <Form form={form} className='pt-5' initialValues={record}>
+          <Form.Item
+            name="id"
+            label="ID"
+            rules={[{ required: true, message: 'ID can not be empty' }]}
+          >
+            <Input disabled />
+          </Form.Item>
+          <Form.Item
             name="sku"
             label="SKU"
             rules={[{ required: true, message: 'SKU can not be empty' }]}
           >
-            <Input disabled />
+            <Input />
           </Form.Item>
           <Form.Item
             name="name"
@@ -140,6 +150,9 @@ const EditModal = ({ record, visible, onCancel, onSave }) => {
           >
             <Input />
           </Form.Item>
+          {/* <Form.Item name="dateadded" label="Date Added" rules={[{ required: true, message: 'Choose date' }]}>
+            <DatePicker />
+          </Form.Item> */}
           <Form.Item
             name="desc"
             label="Descriiption"
@@ -148,7 +161,9 @@ const EditModal = ({ record, visible, onCancel, onSave }) => {
           </Form.Item>
         </Form>
       </Modal>
-    );
-  };
-  
+    </>
+
+  );
+};
+
 export default EditModal

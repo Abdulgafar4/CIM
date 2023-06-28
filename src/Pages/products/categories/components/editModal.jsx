@@ -1,39 +1,42 @@
 /* eslint-disable react/prop-types */
 import { EditOutlined, HomeOutlined } from "@ant-design/icons";
-import { Breadcrumb, Button, Form, Input, Modal } from "antd";
-import { useEffect } from "react";
+import { Breadcrumb, Button, Form, Input, Modal, message } from "antd";
+import { useContext, useState } from "react";
+import { AuthContext } from "../../../../context/AuthContext";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../../../../config/firebase";
 
-
-export const EditButton = ({ record, onEdit }) => {
-
-    const handleEditClick = () => {
-      onEdit(record);
-    };
-  
-    return (
-      <Button icon={<EditOutlined />} onClick={handleEditClick} />
-    );
-  };
-
-  const EditModal = ({ record, visible, onCancel, onSave }) => {
+  const EditModal = ({ record }) => {
       const [form] = Form.useForm();
     
-      const handleSave = () => {
-        form.validateFields().then(values => {
-          onSave(values);
-          form.resetFields();
-          onCancel();
-        });
-        
-      };
+    const [visible, setVisible] = useState(false);
+    const { currentUser } = useContext(AuthContext);
+
+  const userId = currentUser.uid;
+
     
-      useEffect(() => {
-        if (record) {
-          form.setFieldsValue(record);
-        }
-      }, [record, form]);
+        const handleSave = () => {
+          form.validateFields().then((values) => {
+            const documentId = values.id; 
+            delete values.id;
+
+            updateDoc(doc(db, `users/${userId}/productCategory`, documentId.toString()), values)
+              .then(() => {
+                form.resetFields();
+                message.success('Category updated successfully');
+                setVisible(false)
+                window.location.reload();
+              })
+              .catch((error) => {
+                message.error(error.code);
+              });
+          });
+        };
     
       return (
+        <>
+      <Button icon={<EditOutlined />} onClick={() => setVisible(true)} />
+
         <Modal
         title={
           <Breadcrumb
@@ -54,12 +57,12 @@ export const EditButton = ({ record, onEdit }) => {
           />
       }
           open={visible}
-          onCancel={onCancel}
+          onCancel={() => setVisible(false)}
           onOk={handleSave}
           okType="default"
           okText="Update"
         >
-          <Form form={form} className='pt-5'>
+          <Form form={form} className='pt-5' initialValues={record}>
           <Form.Item
               name="id"
               label="ID"
@@ -76,6 +79,7 @@ export const EditButton = ({ record, onEdit }) => {
             </Form.Item>
           </Form>
         </Modal>
+        </>
       );
     };
     

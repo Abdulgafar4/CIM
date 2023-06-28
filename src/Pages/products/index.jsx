@@ -2,19 +2,42 @@
 import { Table, Button, Space, Popconfirm, message, Breadcrumb, Tag } from "antd";
 import { CloseCircleOutlined, HomeOutlined } from "@ant-design/icons";
 import CreateButton from "./components/createButton";
-import { useState } from "react";
-import EditModal, { EditButton } from "./components/editModal";
+import { useContext, useEffect, useState } from "react";
+import EditModal from "./components/editModal";
 import ViewButton from "./components/viewModal";
-import data from "./dummyData";
 import { colors } from "../../colors";
 import SearchInput from "../../Components/AppSearch/SearchInput";
+import { AuthContext } from "../../context/AuthContext";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../config/firebase";
 
 function ProductList() {
-  const [editModalVisible, setEditModalVisible] = useState(false);
-  const [editRecord, setEditRecord] = useState(null);
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState([]);
+  const { currentUser } = useContext(AuthContext);
+  const userId = currentUser.uid;
+
+  useEffect(() => {
+    setLoading(true)
+    const fetchData = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, `users/${userId}/product`));
+        const fetchedData = querySnapshot.docs.map((doc) => ({
+          ...doc.data(),
+        }));
+        setData(fetchedData);
+        setLoading(false)
+      } catch (error) {
+        message.error(error.code);
+      }
+    };
+
+    fetchData();
+  }, [userId]);
 
   const columns = [
+    // { title: "ID", dataIndex: "id", key: "id", responsive: ['sm'] },
     { title: "SKU", dataIndex: "sku", key: "sku", responsive: ['sm'] },
     { title: "Name", dataIndex: "name", key: "name" },
     { title: "Price", dataIndex: "price", key: "price", responsive: ['sm'] },
@@ -67,7 +90,7 @@ function ProductList() {
       key: "supplier",
       responsive: ["xl"],
     },
-    { title: "Date Added", dataIndex: "date", key: "date", responsive: ['lg'] },
+    // { title: "Date Added", dataIndex: "date", key: "date", responsive: ['lg'] },
     {
       title: "Actions",
       dataIndex: "actions",
@@ -75,7 +98,7 @@ function ProductList() {
       render: (_, record) => (
         <Space size="small">
           <ViewButton record={record} />
-          <EditButton record={record} onEdit={handleEdit} />
+          <EditModal record={record} />
           <Popconfirm
             title="Are you sure you want to delete this record?"
             onConfirm={() => handleDelete(record.sku)}
@@ -104,34 +127,14 @@ function ProductList() {
 
   const filteredData = filterTableData(data, searchKeyword);
 
-  const handleEdit = (record) => {
-    setEditRecord(record);
-    setEditModalVisible(true);
-  };
-
-  const handleSaveEdit = (values) => {
-    console.log("Saved edited record:", values);
-    setEditModalVisible(false);
-    message.success("Record edited successfully");
-  };
 
   const handleDelete = (sku) => {
     message.success(`Record with ${sku} deleted`);
   };
 
-  const handleCreate = () => {
-    message.success("New Record Added");
-
-  };
 
   return (
     <div>
-      <EditModal
-        record={editRecord}
-        visible={editModalVisible}
-        onCancel={() => setEditModalVisible(false)}
-        onSave={handleSaveEdit}
-      />
       <Breadcrumb
         items={[
           {
@@ -147,13 +150,14 @@ function ProductList() {
       />
       <div className="flex flex-row justify-between pt-8">
         <SearchInput setSearchKeyword={setSearchKeyword} />
-        <CreateButton onCreate={handleCreate} />
+        <CreateButton />
       </div>
       <Table
         dataSource={filteredData}
         columns={columns}
         bordered
         pagination={true}
+        loading={loading}
       />
     </div>
   );
