@@ -37,6 +37,10 @@ function CreateBtn() {
         });
     });
   };
+  const handleCancel = () => {
+    form.resetFields();
+    setVisible(false);
+  }
 
 
   return (
@@ -62,7 +66,7 @@ function CreateBtn() {
           />
       }
         open={visible}
-        onCancel={() => setVisible(false)}
+        onCancel={handleCancel}
         onOk={handleCreate}
         okType='default'
         okText="Save"

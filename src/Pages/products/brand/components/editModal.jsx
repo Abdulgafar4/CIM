@@ -5,8 +5,9 @@ import { useContext, useState } from "react";
 import { db } from "../../../../config/firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import { AuthContext } from "../../../../context/AuthContext";
+import { fetchData } from "../../../../API";
 
-  const EditModal = ({ record }) => {
+  const EditModal = ({ record, setLoading, setData }) => {
   const [visible, setVisible] = useState(false);
   const { currentUser } = useContext(AuthContext);
 
@@ -24,7 +25,7 @@ import { AuthContext } from "../../../../context/AuthContext";
                 form.resetFields();
                 message.success('Brand updated successfully');
                 setVisible(false)
-                window.location.reload();
+                fetchData(userId, "productBrand", setLoading, setData);
               })
               .catch((error) => {
                 message.error(error.code);

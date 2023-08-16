@@ -30,7 +30,10 @@ function getItem(label, key, icon, children) {
         getItem("Categories", "/products/categories"),
         getItem("Variants", "/products/variants"),
     ]),
-    getItem('Sales', '/sales', <MdOutlineSell />),
+    getItem('Sales', 'sub5', <MdOutlineSell />, [
+      getItem('Sales', '/sales'),
+      getItem('POS', '/sales/pos'),
+    ]),
     getItem('Purchase', '/purchase', <BsMinecartLoaded />),
     getItem('Expenses', 'sub2', <GiPayMoney />, [
       getItem("Expenses", "/expenses"),
@@ -68,13 +71,17 @@ function SideBar(props) {
         collapsed={collapsed}
         breakpoint="md"
         theme="light"
+        style={{}}
       >
         <div className="flex justify-center mt-7 cursor-pointer text-xl text-green-500">
           CIM
         </div>
         <Menu style={{ minHeight: '100vh' }}
           className="mt-10"
-          theme="light" defaultSelectedKeys={['1']} mode="vertical" items={items} 
+          theme="light" 
+          defaultSelectedKeys={['1']} 
+          mode="vertical" 
+          items={items} 
           onClick={(item) => {
             navigate(item.key);
           }}

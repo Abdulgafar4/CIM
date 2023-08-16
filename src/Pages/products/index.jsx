@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { Table, Button, Space, Popconfirm, message, Breadcrumb, Tag } from "antd";
+import { Table, Button, Space, Popconfirm, Breadcrumb, Tag } from "antd";
 import { CloseCircleOutlined, HomeOutlined } from "@ant-design/icons";
 import CreateButton from "./components/createButton";
 import { useContext, useEffect, useState } from "react";
@@ -8,8 +8,7 @@ import ViewButton from "./components/viewModal";
 import { colors } from "../../colors";
 import SearchInput from "../../Components/AppSearch/SearchInput";
 import { AuthContext } from "../../context/AuthContext";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../config/firebase";
+import { fetchData, handleDelete } from "../../API";
 
 function ProductList() {
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -19,39 +18,29 @@ function ProductList() {
   const userId = currentUser.uid;
 
   useEffect(() => {
-    setLoading(true)
-    const fetchData = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, `users/${userId}/product`));
-        const fetchedData = querySnapshot.docs.map((doc) => ({
-          ...doc.data(),
-        }));
-        setData(fetchedData);
-        setLoading(false)
-      } catch (error) {
-        message.error(error.code);
-      }
-    };
-
-    fetchData();
+    fetchData(userId, "product", setLoading, setData);
   }, [userId]);
 
   const columns = [
-    // { title: "ID", dataIndex: "id", key: "id", responsive: ['sm'] },
-    { title: "SKU", dataIndex: "sku", key: "sku", responsive: ['sm'] },
+    { title: "SKU", dataIndex: "sku", key: "sku", responsive: ["sm"] },
     { title: "Name", dataIndex: "name", key: "name" },
-    { title: "Price", dataIndex: "price", key: "price", responsive: ['sm'] },
+    {
+      title: "(₦) Price",
+      dataIndex: "price",
+      key: "price",
+      responsive: ["sm"],
+    },
     {
       title: "Category",
       dataIndex: "category",
       key: "category",
-      responsive: ['md'],
+      responsive: ["md"],
       width: 100,
       render: (_, { category }) => (
         <>
           {category.map((tag) => {
             return (
-              <Tag color={colors.green}  key={tag}>
+              <Tag color={colors.green} key={tag}>
                 {tag.toUpperCase()}
               </Tag>
             );
@@ -59,24 +48,25 @@ function ProductList() {
         </>
       ),
     },
-    { title: "Brand", dataIndex: "brand", key: "brand", responsive: ['lg'] },
+    { title: "Brand", dataIndex: "brand", key: "brand", responsive: ["lg"] },
     {
-      title: "Quantity",
+      title: "In Stock",
       dataIndex: "quantity",
       key: "quantity",
-      responsive: ['md'],
+      responsive: ["md"],
+      render: (_, record) => <div>{Number(record.quantity)}</div>,
     },
     {
-      title: "Variants", 
+      title: "Variants",
       dataIndex: "variants",
       key: "variants",
-      responsive: ['xl'],
+      responsive: ["xl"],
       width: 200,
       render: (_, { variants }) => (
         <>
           {variants.map((tag) => {
             return (
-              <Tag color={colors.green}  key={tag}>
+              <Tag color={colors.green} key={tag}>
                 {tag.toUpperCase()}
               </Tag>
             );
@@ -90,7 +80,6 @@ function ProductList() {
       key: "supplier",
       responsive: ["xl"],
     },
-    // { title: "Date Added", dataIndex: "date", key: "date", responsive: ['lg'] },
     {
       title: "Actions",
       dataIndex: "actions",
@@ -98,10 +87,23 @@ function ProductList() {
       render: (_, record) => (
         <Space size="small">
           <ViewButton record={record} />
-          <EditModal record={record} />
+          <EditModal
+            record={record}
+            setLoading={setLoading}
+            setData={setData}
+          />
           <Popconfirm
             title="Are you sure you want to delete this record?"
-            onConfirm={() => handleDelete(record.sku)}
+            onConfirm={() =>
+              handleDelete(
+                record.id,
+                userId,
+                "Product",
+                "product",
+                setLoading,
+                setData
+              )
+            }
             okText="Yes"
             cancelText="No"
             okType="default"
@@ -127,12 +129,7 @@ function ProductList() {
 
   const filteredData = filterTableData(data, searchKeyword);
 
-
-  const handleDelete = (sku) => {
-    message.success(`Record with ${sku} deleted`);
-  };
-
-
+  //update cart handler
   return (
     <div>
       <Breadcrumb
@@ -150,7 +147,7 @@ function ProductList() {
       />
       <div className="flex flex-row justify-between pt-8">
         <SearchInput setSearchKeyword={setSearchKeyword} />
-        <CreateButton />
+        <CreateButton setLoading={setLoading} setData={setData} />
       </div>
       <Table
         dataSource={filteredData}

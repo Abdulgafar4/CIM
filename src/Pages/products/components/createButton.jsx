@@ -3,10 +3,9 @@ import { useContext, useState } from 'react';
 import { Button, Modal, Form, Input, Select, Breadcrumb, message } from 'antd';
 import { HomeOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { AuthContext } from '../../../context/AuthContext';
-import { addDoc, collection, doc, updateDoc } from 'firebase/firestore';
-import { db } from '../../../config/firebase';
+import { create, fetchData } from '../../../API';
 
-const CreateButton = () => {
+const CreateButton = ({ setLoading, setData }) => {
   const [visible, setVisible] = useState(false);
   const [form] = Form.useForm();
   const { Option } = Select;
@@ -17,29 +16,22 @@ const CreateButton = () => {
 
   const handleCreate = () => {
     form.validateFields().then((values) => {
-      const collectionRef = collection(db, `users/${userId}/product`);
-      addDoc(collectionRef, values)
-        .then((docRef) => {
-          const documentId = docRef.id;
-          const documentRef = doc(db, `users/${userId}/product/${documentId}`);
-          const updatedValues = { ...values, id: documentId };
-          updateDoc(documentRef, updatedValues)
-            .then(() => {
-              form.resetFields();
-              message.success('Product Added Successfully');
-              setVisible(false);
-              window.location.reload();
-            })
-            .catch((error) => {
-              message.error(error.code);
-            });
-        })
-        .catch((error) => {
-          message.error(error.code);
-        });
+      create(userId, values, "Product", "product")
+      .then(() => {
+        form.resetFields();
+        setVisible(false);
+        fetchData(userId, "product", setLoading, setData);
+      })
+      .catch((error) => {
+        message.error(error.code);
+      });
     });
   };
 
+  const handleCancel = () => {
+    form.resetFields();
+    setVisible(false);
+  }
   return (
     <div style={{ marginBottom: 16 }}>
       <Button type='primary' className='bg-green-500 text-white' icon={<PlusCircleOutlined />} onClick={() => setVisible(true)}>Create</Button>
@@ -63,7 +55,7 @@ const CreateButton = () => {
           />
       }
         open={visible}
-        onCancel={() => setVisible(false)}
+        onCancel={handleCancel}
         onOk={handleCreate}
         okType='default'
         okText="Save"
@@ -159,12 +151,10 @@ const CreateButton = () => {
           >
             <Input />
           </Form.Item>
-          {/* <Form.Item name="date" label="Date Added" rules={[{ required: true, message: 'Choose date'}]}>
-           <DatePicker />
-          </Form.Item> */}
           <Form.Item
             name="desc"
             label="Descriiption"
+            rules={[{ required: true, message: 'Description can not be empty' }]}
           >
             <TextArea />
           </Form.Item>

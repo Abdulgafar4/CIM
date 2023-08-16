@@ -3,10 +3,9 @@ import { HomeOutlined, PlusCircleOutlined } from "@ant-design/icons"
 import { Breadcrumb, Button, Form, Input, Modal, message } from "antd"
 import { useContext, useState } from "react";
 import { AuthContext } from "../../../../context/AuthContext";
-import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
-import { db } from "../../../../config/firebase";
+import { create, fetchData } from "../../../../API";
 
-function CreateBtn() {
+function CreateBtn({setLoading, setData}) {
   const [visible, setVisible] = useState(false);
   const [form] = Form.useForm();
   const { currentUser } = useContext(AuthContext);
@@ -15,28 +14,22 @@ function CreateBtn() {
 
   const handleCreate = () => {
     form.validateFields().then((values) => {
-      const collectionRef = collection(db, `users/${userId}/productCategory`);
-      addDoc(collectionRef, values)
-        .then((docRef) => {
-          const documentId = docRef.id;
-          const documentRef = doc(db, `users/${userId}/productCategory/${documentId}`);
-          const updatedValues = { ...values, id: documentId };
-          updateDoc(documentRef, updatedValues)
-            .then(() => {
-              form.resetFields();
-              message.success('Category Added Successfully');
-              setVisible(false);
-              window.location.reload();
-            })
-            .catch((error) => {
-              message.error(error.code);
-            });
-        })
-        .catch((error) => {
-          message.error(error.code);
-        });
+      create(userId, values, "Category", "productCategory")
+      .then(() => {
+        form.resetFields();
+        setVisible(false);
+        fetchData(userId, "productCategory", setLoading, setData);
+      })
+      .catch((error) => {
+        message.error(error.code);
+      });
     });
   };
+
+  const handleCancel = () => {
+    form.resetFields();
+    setVisible(false);
+  }
 
   return (
     <div style={{ marginBottom: 16 }}>
@@ -61,7 +54,7 @@ function CreateBtn() {
           />
       }
         open={visible}
-        onCancel={() => setVisible(false)}
+        onCancel={handleCancel}
         onOk={handleCreate}
         okType='default'
         okText="Save"

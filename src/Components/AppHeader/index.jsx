@@ -3,10 +3,12 @@
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  ShoppingCartOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
+  Badge,
   Button,
   Popover,
   theme,
@@ -16,9 +18,13 @@ import { auth } from "../../config/firebase";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 
 function AppHeader(props) {
+
+  const { cartItems } = useSelector((store) => store.cart);
+  const cartLen = cartItems.length;
 
   const { collapsed, setCollapsed } = props;
   const { dispatch } = useContext(AuthContext)
@@ -44,7 +50,7 @@ function AppHeader(props) {
     setOpen(false)
   }
 
-  const {currentUser} = useContext(AuthContext)
+  const { currentUser } = useContext(AuthContext)
 
 
 
@@ -69,9 +75,14 @@ function AppHeader(props) {
           height: 64,
         }}
       />
-      <Popover content={content} trigger="click" open={open} onOpenChange={handleOpenChange}>
-        <Avatar className=" cursor-pointer" style={{ backgroundColor: '#87d068' }} icon={<UserOutlined />} />
-      </Popover>
+      <div className="flex gap-4 items-center">
+        <Badge count={cartLen} className="cursor-pointer" style={{ backgroundColor: '#87d068' }} onClick={() => navigate("/sales/pos")}>
+          <ShoppingCartOutlined style={{ fontSize: 30, color: '#87d068'  }} />
+        </Badge>
+        <Popover content={content} trigger="click" open={open} onOpenChange={handleOpenChange}>
+          <Avatar className=" cursor-pointer" style={{ backgroundColor: '#87d068' }} icon={<UserOutlined />} />
+        </Popover>
+      </div>
     </div>
   );
 }

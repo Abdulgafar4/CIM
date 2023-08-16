@@ -5,8 +5,9 @@ import { useContext, useState } from 'react';
 import { AuthContext } from '../../../context/AuthContext';
 import { db } from '../../../config/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
+import { fetchData } from '../../../API';
 
-const EditModal = ({ record }) => {
+const EditModal = ({ record, setLoading, setData }) => {
   const { Option } = Select;
   const { TextArea } = Input;
   const [form] = Form.useForm();
@@ -26,7 +27,7 @@ const EditModal = ({ record }) => {
           form.resetFields();
           message.success('Product updated successfully');
           setVisible(false)
-          window.location.reload();
+          fetchData(userId, "product", setLoading, setData);
         })
         .catch((error) => {
           message.error(error.code);
@@ -103,7 +104,7 @@ const EditModal = ({ record }) => {
               style={{
                 width: '100%',
               }}
-              placeholder="Tags Mode"
+              placeholder="Select Category"
 
             >
               <Option value="male">male</Option>
@@ -116,7 +117,18 @@ const EditModal = ({ record }) => {
             label="Brand"
             rules={[{ required: true, message: 'Brand name can not be empty' }]}
           >
-            <Input />
+            <Select
+              mode="tags"
+              style={{
+                width: '100%',
+              }}
+              placeholder="Select Brand"
+
+            >
+              <Option value="phone">Tecno</Option>
+              <Option value="charger">Nokia</Option>
+              <Option value="powerbank">Samsung</Option>
+            </Select>
           </Form.Item>
           <Form.Item
             name="quantity"
@@ -135,7 +147,7 @@ const EditModal = ({ record }) => {
               style={{
                 width: '100%',
               }}
-              placeholder="Tags Mode"
+              placeholder="Select Variants"
 
             >
               <Option value="male">male</Option>
@@ -150,9 +162,6 @@ const EditModal = ({ record }) => {
           >
             <Input />
           </Form.Item>
-          {/* <Form.Item name="dateadded" label="Date Added" rules={[{ required: true, message: 'Choose date' }]}>
-            <DatePicker />
-          </Form.Item> */}
           <Form.Item
             name="desc"
             label="Descriiption"

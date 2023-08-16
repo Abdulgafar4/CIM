@@ -1,13 +1,12 @@
 import { CloseCircleOutlined, HomeOutlined } from "@ant-design/icons"
-import { Breadcrumb, Button, Popconfirm, Space, Table, Tag, message } from "antd"
+import { Breadcrumb, Button, Popconfirm, Space, Table, Tag } from "antd"
 import SearchInput from "../../../Components/AppSearch/SearchInput"
 import CreateBtn from "./components/createBtn"
 import { useContext, useEffect, useState } from "react";
 import EditModal from "./components/editModal";
 import { colors } from "../../../colors";
-import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
-import { db } from "../../../config/firebase";
 import { AuthContext } from "../../../context/AuthContext";
+import { fetchData, handleDelete } from "../../../API";
 
 
 function ProductVariants() {
@@ -18,21 +17,7 @@ function ProductVariants() {
   const userId = currentUser.uid;
 
   useEffect(() => {
-    setLoading(true)
-    const fetchData = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, `users/${userId}/productVariant`));
-        const fetchedData = querySnapshot.docs.map((doc) => ({
-          ...doc.data(),
-        }));
-        setData(fetchedData);
-        setLoading(false)
-      } catch (error) {
-        message.error(error.code);
-      }
-    };
-
-    fetchData();
+    fetchData(userId, "productVariant", setLoading, setData);
   }, [userId]);
 
 
@@ -63,10 +48,10 @@ function ProductVariants() {
       key: "actions",
       render: (_, record) => (
         <Space size="small">
-          <EditModal record={record} />
+          <EditModal record={record} setLoading={setLoading} setData={setData} />
           <Popconfirm
             title="Are you sure you want to delete this record?"
-            onConfirm={() => handleDelete(record.id)}
+            onConfirm={() => handleDelete(record.id, userId, "Variant", "productVariant", setLoading, setData)}
             okText="Yes"
             cancelText="No"
             okType="default"
@@ -77,17 +62,6 @@ function ProductVariants() {
       ),
     },
   ]
-
-  const handleDelete = async (id) => {
-    try {
-      const docRef = doc(db, `users/${userId}/productVariant/${id.toString()}`);
-      await deleteDoc(docRef);
-      message.success('Variant deleted successfully');
-      window.location.reload();
-    } catch (error) {
-      message.error(error.code);
-    }
-  };
 
   const filterTableData = (data, keyword) => {
     if (!keyword) {
@@ -124,7 +98,7 @@ function ProductVariants() {
       />
       <div className="flex flex-row justify-between pt-8">
         <SearchInput setSearchKeyword={setSearchKeyword} />
-        <CreateBtn />
+        <CreateBtn setLoading={setLoading} setData={setData}/>
       </div>
       <Table
         dataSource={filteredData}

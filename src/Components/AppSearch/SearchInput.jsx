@@ -12,7 +12,7 @@ function SearchInput({ setSearchKeyword }) {
   return (
     <Search
       placeholder="Search the table"
-      onSearch={handleSearch}
+      onChange={(e) => handleSearch(e.target.value)}
       allowClear
       style={{ width: 200, marginBottom: 16 }}
     />

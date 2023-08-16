@@ -5,10 +5,11 @@ import { useContext, useState } from "react";
 import { AuthContext } from "../../../../context/AuthContext";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../../../config/firebase";
+import { fetchData } from "../../../../API";
 
 
 
-  const EditModal = ({ record }) => {
+  const EditModal = ({ record, setLoading, setData }) => {
     const [form] = Form.useForm();
     
     const [visible, setVisible] = useState(false);
@@ -27,7 +28,7 @@ import { db } from "../../../../config/firebase";
                 form.resetFields();
                 message.success('Variant updated successfully');
                 setVisible(false)
-                window.location.reload();
+                fetchData(userId, "productVariant", setLoading, setData);
               })
               .catch((error) => {
                 message.error(error.code);

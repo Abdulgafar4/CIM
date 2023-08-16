@@ -19,6 +19,8 @@ import ProductVariants from "../../Pages/products/variants";
 import Auth from "../../Pages/Auth/Auth";
 import { useContext } from "react";
 import { AuthContext } from '../../context/AuthContext';
+import Pos from "../../Pages/sales/pos";
+import SalesReturn from '../../Pages/sales/sales_return/index';
 
 function AppRoutes() {
   const {currentUser} = useContext(AuthContext)
@@ -158,10 +160,18 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/sales/pos"
+        element={
+          <RequireAuth>
+            <Pos />
+          </RequireAuth>
+        }
+      />
+      <Route
         path="/sales/sales_return"
         element={
           <RequireAuth>
-            <Dashboard />
+            <SalesReturn />
           </RequireAuth>
         }
       />

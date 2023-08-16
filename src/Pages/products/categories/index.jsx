@@ -1,12 +1,11 @@
 import { CloseCircleOutlined, HomeOutlined } from "@ant-design/icons"
-import { Breadcrumb, Button, Popconfirm, Space, Table, message } from "antd"
+import { Breadcrumb, Button, Popconfirm, Space, Table } from "antd"
 import SearchInput from "../../../Components/AppSearch/SearchInput"
 import CreateBtn from "./components/createBtn"
 import { useContext, useEffect, useState } from "react";
 import EditModal from "./components/editModal";
 import { AuthContext } from "../../../context/AuthContext";
-import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
-import { db } from "../../../config/firebase";
+import { fetchData, handleDelete } from "../../../API";
 
 function ProductCategory() {
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -16,21 +15,7 @@ function ProductCategory() {
   const userId = currentUser.uid;
 
   useEffect(() => {
-    setLoading(true)
-    const fetchData = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, `users/${userId}/productCategory`));
-        const fetchedData = querySnapshot.docs.map((doc) => ({
-          ...doc.data(),
-        }));
-        setData(fetchedData);
-        setLoading(false)
-      } catch (error) {
-        message.error(error.code);
-      }
-    };
-
-    fetchData();
+    fetchData(userId, "productCategory", setLoading, setData);
   }, [userId]);
 
   const columns = [
@@ -42,10 +27,10 @@ function ProductCategory() {
       key: "actions",
       render: (_, record) => (
         <Space size="small">
-          <EditModal record={record}  />
+          <EditModal record={record} setLoading={setLoading} setData={setData} />
           <Popconfirm
             title="Are you sure you want to delete this record?"
-            onConfirm={() => handleDelete(record.id)}
+            onConfirm={() => handleDelete(record.id, userId, "Category", "productCategory", setLoading, setData)}
             okText="Yes"
             cancelText="No"
             okType="default"
@@ -57,16 +42,6 @@ function ProductCategory() {
     },
   ]
 
-  const handleDelete = async (id) => {
-    try {
-      const docRef = doc(db, `users/${userId}/productCategory/${id.toString()}`);
-      await deleteDoc(docRef);
-      message.success('Category deleted successfully');
-      window.location.reload();
-    } catch (error) {
-      message.error(error.code);
-    }
-  };
 
   const filterTableData = (data, keyword) => {
     if (!keyword) {
@@ -103,7 +78,7 @@ function ProductCategory() {
       />
       <div className="flex flex-row justify-between pt-8">
       <SearchInput setSearchKeyword={setSearchKeyword} />
-      <CreateBtn />
+      <CreateBtn setLoading={setLoading} setData={setData}/>
       </div>
       <Table
         dataSource={filteredData}
