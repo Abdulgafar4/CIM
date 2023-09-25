@@ -29,6 +29,7 @@ function Graph() {
     plugins: {
       legend: {
           display: true,
+          maxHeight: 200,
       }
   },
     scales: {
@@ -74,9 +75,9 @@ function Graph() {
   };
   return (
     <Col className="hidden min-[550px]:block">
-    <Card title="Sales vs Purchase" headStyle={{borderLeftColor: colors.green, borderLeftWidth: "3px", color: colors.green }}>
+    <Card title="Sales vs Purchase" headStyle={{borderLeftColor: colors.green, borderLeftWidth: "3px", color: colors.green }} >
     <div className="w-full flex">
-        <Bar style={{ display: "flex", flexGrow: 1, height: "398px"}} data={data} options={options} />
+        <Bar height="98px" data={data} options={options} />
         </div>
     </Card>
     </Col>

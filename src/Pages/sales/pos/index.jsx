@@ -18,6 +18,7 @@ import { fetchData } from "../../../API";
 import { AuthContext } from "../../../context/AuthContext";
 import SearchInput from "../../../Components/AppSearch/SearchInput";
 import GenerateInvoiceBtn from "./components/GenerateInvoiceBtn";
+import { useCallback } from "react";
 
 function Pos() {
   const [data, setData] = useState([]);
@@ -31,12 +32,24 @@ function Pos() {
   const dispatch = useDispatch();
 
 
-  useEffect(() => {
-    fetchData(userId, "product", setLoading, setData);
+  const calculateSubTotal = useCallback(() => {
     let temp = 0;
     cartItems.forEach((item) => (temp += item.price * item.cartQuantity));
     setSubTotal(temp);
-  }, [cartItems, userId]);
+  },[cartItems]);
+
+  useEffect(() => {
+    fetchData(userId, 'product', setLoading, setData);
+    calculateSubTotal();
+  }, [userId, cartItems, calculateSubTotal]);
+
+  const handleDecrease = (record) => {
+    dispatch(decreaseAmount(record));
+  };
+
+  const handleIncrease = (record) => {
+    dispatch(addToCart(record));
+  };
 
   const columns = [
     { title: "Name", dataIndex: "name" },
@@ -45,6 +58,12 @@ function Pos() {
       title: "Quantity",
       dataIndex: "quantity",
       responsive: ["sm"],
+      render: (_, record) => (
+        <div>
+          {
+            Number(record.quantity)}
+        </div>
+      ),
     },
     {
       title: "Action",
@@ -54,7 +73,7 @@ function Pos() {
           type="primary"
           className="bg-green-500 text-white"
           icon={<ShoppingCartOutlined />}
-          onClick={() => dispatch(addToCart(record))}
+          onClick={() => handleIncrease(record)}
         />
       ),
     },
@@ -71,13 +90,13 @@ function Pos() {
           <MinusCircleOutlined
             className="mx-3"
             style={{ cursor: "pointer" }}
-            onClick={() => dispatch(decreaseAmount(record))}
+            onClick={() => handleDecrease(record)}
           />
           <b>{record.cartQuantity}</b>
           <PlusCircleOutlined
             className="mx-3"
             style={{ cursor: "pointer" }}
-            onClick={() => dispatch(addToCart(record))}
+            onClick={() => handleIncrease(record)}
           />
         </div>
       ),

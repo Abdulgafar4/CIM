@@ -19,13 +19,12 @@ function Sales() {
     fetchData(userId, "bill", setLoading, setData);
   }, [userId]);
 
-  // console.log(data)
 
   const columns = [
-    { title: "ID", dataIndex: "id", key: "id", responsive: ['sm'] },
-    // { title: "Date Added", dataIndex: "createAt", key: "createAt", responsive: ['sm'] },
-    { title: "Added by", dataIndex: "addedby", key: "addedby", responsive: ['sm'] },
-    { title: "Customer Name", dataIndex: "name", key: "name" },
+    { title: "ID", dataIndex: "id", key: "id" },
+    { title: "Date Added", dataIndex: "createdAt", key: "createdAt", responsive: ['lg'] },
+    { title: "Cashier", dataIndex: "addedby", key: "addedby", responsive: ['sm'] },
+    { title: "Customer Name", dataIndex: "name", key: "name", responsive: ['sm'] },
     { title: "(₦) Grand Total", dataIndex: "subTotal", key: "subTotal", responsive: ['lg'] },
     {
       title: "(₦) Paid",
@@ -73,7 +72,8 @@ function Sales() {
     })
   };
 
-  const filteredData = filterTableData(data, searchKeyword);
+  const filteredData = filterTableData(data, searchKeyword); 
+    
 
 
   return (

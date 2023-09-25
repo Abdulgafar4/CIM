@@ -1,10 +1,9 @@
 import { CloseCircleOutlined, HomeOutlined } from "@ant-design/icons"
-import { Breadcrumb, Button, Popconfirm, Space, Table, Tag } from "antd"
+import { Breadcrumb, Button, Popconfirm, Space, Table } from "antd"
 import SearchInput from "../../../Components/AppSearch/SearchInput"
 import CreateBtn from "./components/createBtn"
 import { useContext, useEffect, useState } from "react";
 import EditModal from "./components/editModal";
-import { colors } from "../../../colors";
 import { AuthContext } from "../../../context/AuthContext";
 import { fetchData, handleDelete } from "../../../API";
 
@@ -23,24 +22,12 @@ function ProductVariants() {
 
   const columns = [
     { title: "ID", dataIndex: "id", key: "id", responsive: ['sm'] },
-    { title: "Name", dataIndex: "name", key: "name" },
+    { title: "Type", dataIndex: "value", key: "value" },
     {
-      title: "Variant Options",
-      dataIndex: "options",
-      key: "options",
+      title: "Name",
+      dataIndex: "label",
+      key: "label",
       responsive: ['md'],
-      width: 200,
-      render: (_, { options }) => (
-        <>
-          {options.map((tag) => {
-            return (
-              <Tag color={colors.green} key={tag}>
-                {tag.toUpperCase()}
-              </Tag>
-            );
-          })}
-        </>
-      ),
     },
     {
       title: "Actions",

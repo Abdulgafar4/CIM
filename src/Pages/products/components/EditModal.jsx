@@ -6,15 +6,25 @@ import { AuthContext } from '../../../context/AuthContext';
 import { db } from '../../../config/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { fetchData } from '../../../API';
+import { useEffect } from 'react';
 
 const EditModal = ({ record, setLoading, setData }) => {
-  const { Option } = Select;
-  const { TextArea } = Input;
   const [form] = Form.useForm();
   const [visible, setVisible] = useState(false);
   const { currentUser } = useContext(AuthContext);
+  const [catData, setCatData] = useState([]);
+  const [variantData, setVariantData] = useState([]);
+  const [supplier, setSupplier] = useState([]);
+
 
   const userId = currentUser.uid;
+
+  useEffect(() => {
+    fetchData(userId, "productCategory", setLoading, setCatData);
+    fetchData(userId, "suppliers", setLoading, setSupplier);
+    fetchData(userId, "productVariant", setLoading, setVariantData);
+  }, [userId, setLoading]);
+
 
 
   const handleSave = () => {
@@ -66,107 +76,86 @@ const EditModal = ({ record, setLoading, setData }) => {
         okText="Update"
       >
         <Form form={form} className='pt-5' initialValues={record}>
-          <Form.Item
+        <Form.Item
             name="id"
             label="ID"
             rules={[{ required: true, message: 'ID can not be empty' }]}
           >
             <Input disabled />
           </Form.Item>
-          <Form.Item
-            name="sku"
-            label="SKU"
-            rules={[{ required: true, message: 'SKU can not be empty' }]}
+        <Form.Item
+            name="code"
+            label="Product Code"
+            rules={[
+              { required: true, message: "Product Code can not be empty" },
+            ]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="name"
             label="Product Name"
-            rules={[{ required: true, message: 'Product name can not be empty' }]}
+            rules={[
+              { required: true, message: "Product name can not be empty" },
+            ]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="price"
             label="Price"
-            rules={[{ required: true, message: 'Enter a Price' }]}
+            rules={[{ required: true, message: "Enter a Price" }]}
           >
-            <Input />
+           <Input />
           </Form.Item>
           <Form.Item
             name="category"
             label="Category"
-            rules={[{ required: true, message: 'Category can not be empty' }]}
+            rules={[{ required: true, message: "Category can not be empty" }]}
           >
             <Select
               mode="tags"
               style={{
-                width: '100%',
+                width: "100%",
               }}
-              placeholder="Select Category"
-
-            >
-              <Option value="male">male</Option>
-              <Option value="female">female</Option>
-              <Option value="other">other</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item
-            name="brand"
-            label="Brand"
-            rules={[{ required: true, message: 'Brand name can not be empty' }]}
-          >
-            <Select
-              mode="tags"
-              style={{
-                width: '100%',
-              }}
-              placeholder="Select Brand"
-
-            >
-              <Option value="phone">Tecno</Option>
-              <Option value="charger">Nokia</Option>
-              <Option value="powerbank">Samsung</Option>
-            </Select>
+              placeholder="Select the Product Category"
+              options={catData}
+            />
           </Form.Item>
           <Form.Item
             name="quantity"
             label="Quantity"
-            rules={[{ required: true, message: 'Quantity can not be empty' }]}
+            rules={[{ required: true, message: "Quantity can not be empty" }]}
           >
-            <Input />
+            <Input type="number" />
           </Form.Item>
           <Form.Item
             name="variants"
             label="Variants"
-            rules={[{ required: true, message: 'Variants can not be empty' }]}
+            rules={[{ required: true, message: "Variants can not be empty" }]}
           >
             <Select
               mode="tags"
               style={{
-                width: '100%',
+                width: "100%",
               }}
-              placeholder="Select Variants"
-
-            >
-              <Option value="male">male</Option>
-              <Option value="female">female</Option>
-              <Option value="other">other</Option>
-            </Select>
+              placeholder="Select the Variants"
+              options={variantData}
+            />
           </Form.Item>
           <Form.Item
             name="supplier"
             label="Supplier"
-            rules={[{ required: true, message: 'Supplier can not be empty' }]}
+            rules={[{ required: true, message: "Supplier can not be empty" }]}
           >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="desc"
-            label="Descriiption"
-          >
-            <TextArea />
+              <Select
+              mode="tags"
+              style={{
+                width: "100%",
+              }}
+              placeholder="Select the Supplier"
+              options={supplier}
+            />
           </Form.Item>
         </Form>
       </Modal>

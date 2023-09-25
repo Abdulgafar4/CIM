@@ -1,21 +1,21 @@
 /* eslint-disable react/prop-types */
+import { Modal, Form, Input, Button, Breadcrumb, message } from 'antd';
 import { EditOutlined, HomeOutlined } from "@ant-design/icons";
-import { Breadcrumb, Button, Form, Input, Modal, message } from "antd";
-import { useContext, useState } from "react";
-import { AuthContext } from "../../../../context/AuthContext";
-import { doc, updateDoc } from "firebase/firestore";
-import { db } from "../../../../config/firebase";
-import { fetchData } from "../../../../API";
-
-
+import { useContext, useState } from 'react';
+import { AuthContext } from '../../../context/AuthContext';
+import { db } from '../../../config/firebase';
+import { doc, updateDoc } from 'firebase/firestore';
+import { fetchData } from '../../../API';
 
 const EditModal = ({ record, setLoading, setData }) => {
   const [form] = Form.useForm();
-
   const [visible, setVisible] = useState(false);
   const { currentUser } = useContext(AuthContext);
 
+
   const userId = currentUser.uid;
+
+
 
 
   const handleSave = () => {
@@ -23,12 +23,12 @@ const EditModal = ({ record, setLoading, setData }) => {
       const documentId = values.id;
       delete values.id;
 
-      updateDoc(doc(db, `users/${userId}/productVariant`, documentId.toString()), values)
+      updateDoc(doc(db, `users/${userId}/expenses`, documentId.toString()), values)
         .then(() => {
           form.resetFields();
-          message.success('Variant updated successfully');
+          message.success('Expenses updated successfully');
           setVisible(false)
-          fetchData(userId, "productVariant", setLoading, setData);
+          fetchData(userId, "expenses", setLoading, setData);
         })
         .catch((error) => {
           message.error(error.code);
@@ -50,12 +50,12 @@ const EditModal = ({ record, setLoading, setData }) => {
                 title: <HomeOutlined />,
               },
               {
-                href: "",
-                title: <span>Product Variants</span>,
+                href: "/expenses",
+                title: <span>Expenses</span>,
               },
               {
                 href: "",
-                title: <span>Edit Variant</span>
+                title: <span>Edit Expenses</span>
               }
             ]}
           />
@@ -67,7 +67,7 @@ const EditModal = ({ record, setLoading, setData }) => {
         okText="Update"
       >
         <Form form={form} className='pt-5' initialValues={record}>
-          <Form.Item
+        <Form.Item
             name="id"
             label="ID"
             rules={[{ required: true, message: 'ID can not be empty' }]}
@@ -75,23 +75,25 @@ const EditModal = ({ record, setLoading, setData }) => {
             <Input disabled />
           </Form.Item>
           <Form.Item
-            name="value"
-            label="Variant Type"
-            rules={[{ required: true, message: 'This can not be empty' }]}
+            name="purpose"
+            label="Purpose"
+            rules={[
+              { required: true, message: "Purpose can not be empty" },
+            ]}
           >
             <Input />
           </Form.Item>
           <Form.Item
-            name="label"
-            label="Variant Name"
-            rules={[{ required: true, message: 'This can not be empty' }]}
+            name="amount"
+            label="Amount"
+            rules={[{ required: true, message: "Enter Amount" }]}
           >
             <Input />
-
           </Form.Item>
         </Form>
       </Modal>
     </>
+
   );
 };
 

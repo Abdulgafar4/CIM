@@ -20,7 +20,7 @@ function ProductCategory() {
 
   const columns = [
     { title: "ID", dataIndex: "id", key: "id", responsive: ['sm'] },
-    { title: "Name", dataIndex: "name", key: "name" },
+    { title: "Value", dataIndex: "value", key: "value" },
     {
       title: "Actions",
       dataIndex: "actions",

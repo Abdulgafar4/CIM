@@ -26,7 +26,6 @@ function getItem(label, key, icon, children) {
     getItem('Dashboard', '/', <RxDashboard />),
     getItem('Products', 'sub1', <BsBoxSeam />, [
         getItem("Products", "/products"),
-        getItem("Brand", "/products/brands"),
         getItem("Categories", "/products/categories"),
         getItem("Variants", "/products/variants"),
     ]),
@@ -34,11 +33,8 @@ function getItem(label, key, icon, children) {
       getItem('Sales', '/sales'),
       getItem('POS', '/sales/pos'),
     ]),
-    getItem('Purchase', '/purchase', <BsMinecartLoaded />),
-    getItem('Expenses', 'sub2', <GiPayMoney />, [
-      getItem("Expenses", "/expenses"),
-      getItem("Categories", "/expenses/categories"),
-  ]),
+    getItem('Purchase', '/purchases', <BsMinecartLoaded />),
+    getItem('Expenses', '/expenses', <GiPayMoney />),
     getItem('People', 'sub3', <BsPeople />, [
       getItem("Customers", "/customers"),
       getItem("Suppliers", "/suppliers"),
@@ -48,7 +44,7 @@ function getItem(label, key, icon, children) {
       getItem("Employee", "/employees"),
   ]),
     getItem('Sales Return', '/sales/sales_return', <BsBoxArrowLeft />),
-    getItem('Purchase Return', '/purchase_return', <BsBoxArrowRight />),
+    getItem('Purchase Return', '/purchases/purchase_return', <BsBoxArrowRight />),
   ];
 
 

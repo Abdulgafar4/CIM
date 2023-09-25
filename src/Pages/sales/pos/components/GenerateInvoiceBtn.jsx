@@ -7,6 +7,8 @@ import { create, fetchData } from "../../../../API";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { clearCart } from "../../../../redux/cartSlice";
+import { useRef } from "react";
+
 
 const GenerateInvoiceBtn = ({ subTotal, record }) => {
   const [visible, setVisible] = useState(false);
@@ -15,12 +17,18 @@ const GenerateInvoiceBtn = ({ subTotal, record }) => {
   const { currentUser } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [customerData, setCustomerData] = useState([]);
+  const [cashierData, setCashierData] = useState([]);
   const navigate = useNavigate();
-
+  const inputRef = useRef(null);
+  const sharedProps = {
+    defaultValue: '.00',
+    ref: inputRef,
+  };
   const userId = currentUser.uid;
 
   useEffect(() => {
-    fetchData(userId, "customer", setLoading, setCustomerData);
+    fetchData(userId, "customers", setLoading, setCustomerData);
+    fetchData(userId, "employees", setLoading, setCashierData);
   }, [userId]);
 
   const { cartItems } = useSelector((store) => store.cart);
@@ -30,19 +38,19 @@ const GenerateInvoiceBtn = ({ subTotal, record }) => {
 
   const handleCreate = () => {
     form.validateFields().then((values) => {
-      create(userId, {...values, subTotal, cartItems}, "Bill", "bill")
+      create(userId, { ...values, subTotal, cartItems }, "Bill", "bill")
         .then(() => {
           form.resetFields();
           setVisible(false);
           navigate("/sales");
-          dispatch(clearCart(record))
-
+          dispatch(clearCart(record));
         })
         .catch((error) => {
           message.error(error.code);
         });
     });
   };
+
 
   const handleCancel = () => {
     form.resetFields();
@@ -56,7 +64,7 @@ const GenerateInvoiceBtn = ({ subTotal, record }) => {
         type="primary"
         className="bg-green-500 text-white"
         onClick={() => setVisible(true)}
-        disabled = {cartItems.length === 0}
+        disabled={cartItems.length === 0}
       >
         Generate Invoice
       </Button>
@@ -86,12 +94,21 @@ const GenerateInvoiceBtn = ({ subTotal, record }) => {
         okText="Generate Bill"
       >
         <Form form={form} className="py-5">
-        <Form.Item
+          <Form.Item
             name="addedby"
-            label="Added By"
+            label="Cashier"
             rules={[{ required: true, message: "This can not be empty" }]}
           >
-            <Input />
+            <Select
+              style={{
+                width: "100%",
+              }}
+              placeholder="Cashier"
+              options={cashierData}
+              loading={loading}
+              defaultValue="Manager"
+
+            />
           </Form.Item>
           <Form.Item
             name="name"
@@ -105,12 +122,10 @@ const GenerateInvoiceBtn = ({ subTotal, record }) => {
                 width: "100%",
               }}
               placeholder="Walk In Customer"
-            >
-              <Option value="Walk In Customer">Walk In Customer</Option>
-              {customerData.map((data) => {
-                <Option value={data.name} loading={loading}>{data.name}</Option>;
-              })}
-            </Select>
+              options={customerData}
+              loading={loading}
+              defaultValue="Walk In Customer"
+            />
           </Form.Item>
           <Form.Item
             name="paymentmethod"
@@ -129,6 +144,22 @@ const GenerateInvoiceBtn = ({ subTotal, record }) => {
             </Select>
           </Form.Item>
           <Form.Item
+            name="paymentstatus"
+            label="Payment Status"
+            rules={[{ required: true, message: "Payment Method can not be empty" }]}
+          >
+            <Select
+              style={{
+                width: "100%",
+              }}
+              placeholder="Select the Payment Status"
+            >
+              <Option value="Paid">Paid</Option>
+              <Option value="Partial">Partial</Option>
+              <Option value="Unpaid">Unpaid</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
             name="amountpaid"
             label="Amount Paid"
             rules={[{ required: true, message: "This can not be empty" }]}
@@ -140,10 +171,14 @@ const GenerateInvoiceBtn = ({ subTotal, record }) => {
             label="Remaining Amount"
             rules={[{ required: true, message: "This can not be empty" }]}
           >
-            <Input />
+            <Input onClick={() => {
+              inputRef.current.focus({
+                cursor: 'start',
+              });
+            }} {...sharedProps} />
           </Form.Item>
           <div>
-             <h1 className="font-bold text-green-500">Total Amount: ₦ {subTotal}</h1>
+            <h1 className="font-bold text-green-500">Total Amount: ₦ {subTotal}</h1>
           </div>
         </Form>
       </Modal>

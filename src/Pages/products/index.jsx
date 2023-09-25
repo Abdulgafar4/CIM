@@ -1,10 +1,10 @@
 /* eslint-disable react/prop-types */
 import { Table, Button, Space, Popconfirm, Breadcrumb, Tag } from "antd";
 import { CloseCircleOutlined, HomeOutlined } from "@ant-design/icons";
-import CreateButton from "./components/createButton";
+import CreateButton from "./components/CreateButton";
 import { useContext, useEffect, useState } from "react";
-import EditModal from "./components/editModal";
-import ViewButton from "./components/viewModal";
+import EditModal from "./components/EditModal";
+import ViewButton from "./components/ViewModal";
 import { colors } from "../../colors";
 import SearchInput from "../../Components/AppSearch/SearchInput";
 import { AuthContext } from "../../context/AuthContext";
@@ -22,19 +22,25 @@ function ProductList() {
   }, [userId]);
 
   const columns = [
-    { title: "SKU", dataIndex: "sku", key: "sku", responsive: ["sm"] },
-    { title: "Name", dataIndex: "name", key: "name" },
+    {
+      title: "Date Added",
+      dataIndex: "createdAt",
+      key: "date",
+      responsive: ["sm"]
+    },
+    { title: "Code", dataIndex: "code", key: "code"},
+    { title: "Name", dataIndex: "name", key: "name", responsive: ["sm"] },
     {
       title: "(₦) Price",
       dataIndex: "price",
       key: "price",
-      responsive: ["sm"],
+      responsive: ["md"],
     },
     {
       title: "Category",
       dataIndex: "category",
       key: "category",
-      responsive: ["md"],
+      responsive: ["lg"],
       width: 100,
       render: (_, { category }) => (
         <>
@@ -48,13 +54,12 @@ function ProductList() {
         </>
       ),
     },
-    { title: "Brand", dataIndex: "brand", key: "brand", responsive: ["lg"] },
     {
-      title: "In Stock",
+      title: "Quantity",
       dataIndex: "quantity",
       key: "quantity",
-      responsive: ["md"],
-      render: (_, record) => <div>{Number(record.quantity)}</div>,
+      responsive: ["lg"],
+
     },
     {
       title: "Variants",
@@ -75,7 +80,7 @@ function ProductList() {
       ),
     },
     {
-      title: "supplier",
+      title: "Supplier",
       dataIndex: "supplier",
       key: "supplier",
       responsive: ["xl"],

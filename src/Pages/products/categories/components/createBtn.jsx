@@ -61,8 +61,16 @@ function CreateBtn({setLoading, setData}) {
       >
         <Form form={form} className='pt-5'>
           <Form.Item
-            name="name"
-            label="Category"
+            name="label"
+            label="Category Label"
+            rules={[{ required: true, message: 'This can not be empty' }]}
+            
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="value"
+            label="Category Value"
             rules={[{ required: true, message: 'This can not be empty' }]}
           >
             <Input />

@@ -72,8 +72,15 @@ import { fetchData } from "../../../../API";
               <Input disabled />
             </Form.Item>
             <Form.Item
-              name="name"
-              label="Category"
+              name="label"
+              label="Category Label"
+              rules={[{ required: true, message: 'This can not be empty' }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="value"
+              label="Category Value"
               rules={[{ required: true, message: 'This can not be empty' }]}
             >
               <Input />

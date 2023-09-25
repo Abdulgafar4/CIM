@@ -1,14 +1,12 @@
 /* eslint-disable react/prop-types */
 import { Navigate, Route, Routes } from "react-router-dom";
 import Expenses from "../../Pages/expenses";
-import ExpensesCat from "../../Pages/expenses/categories";
 import Attendance from "../../Pages/hrm/attendance";
 import Employees from "../../Pages/hrm/employees";
 import LeaveRequest from "../../Pages/hrm/leave";
 import LeaveType from "../../Pages/hrm/leave/type";
 import Customers from "../../Pages/people/customers";
 import Suppliers from "../../Pages/people/suppliers";
-import ProductBrand from "../../Pages/products/brand";
 import ProductCategories from "../../Pages/products/categories";
 import ProductList from "../../Pages/products";
 import Purchase from "../../Pages/purchases";
@@ -44,14 +42,6 @@ function AppRoutes() {
         element={
           <RequireAuth>
             <Expenses />
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/expenses/catagories"
-        element={
-          <RequireAuth>
-            <ExpensesCat />
           </RequireAuth>
         }
       />
@@ -104,14 +94,6 @@ function AppRoutes() {
         }
       />
       <Route
-        path="/products/brands"
-        element={
-          <RequireAuth>
-            <ProductBrand />
-          </RequireAuth>
-        }
-      />
-      <Route
         path="/products/categories"
         element={
           <RequireAuth>
@@ -136,7 +118,7 @@ function AppRoutes() {
         }
       />
       <Route
-        path="/purchase"
+        path="/purchases"
         element={
           <RequireAuth>
             <Purchase />
@@ -144,7 +126,7 @@ function AppRoutes() {
         }
       />
       <Route
-        path="/purchase/purchase_return"
+        path="/purchases/purchase_return"
         element={
           <RequireAuth>
             <PurchaseReturn />

@@ -1,43 +1,59 @@
-import { addDoc, collection, deleteDoc, doc, getDocs, orderBy, serverTimestamp, updateDoc } from "firebase/firestore";
-import { db } from "../config/firebase";
+import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore"; 
+import { db } from "../config/firebase"; 
 import { message } from "antd";
 
- export const fetchData = async (userId, collectionName, setLoading, setData) => {
+const formatDate = (date) => {
+  const options = { 
+    year: 'numeric', 
+    month: 'numeric', 
+    day: 'numeric', 
+  };
+  return date.toLocaleString('en-US', options);
+};
+
+export const fetchData = async (userId, collectionName, setLoading, setData) => {
   setLoading(true);
   try {
-    const querySnapshot = await getDocs(collection(db, `users/${userId}/${collectionName}`), orderBy('createAt', 'asc'));
-    const fetchedData = querySnapshot.docs.map((doc) => ({
-      ...doc.data(),
-    }));
+    const querySnapshot = await getDocs(collection(db, `users/${userId}/${collectionName}`));
+    const fetchedData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    
+    // Sort the data by createdAt in descending order
+    fetchedData.sort((a, b) => (new Date(b.createdAt) - new Date(a.createdAt)));
+
     setData(fetchedData);
-    setLoading(false);
   } catch (error) {
-    message.error(error.code);
+    message.error("Error fetching data: " + error.message);
+  } finally {
     setLoading(false);
   }
 };
 
+
 export const handleDelete = async (id, userId, title, collectionName, setLoading, setData) => {
   try {
-    const docRef = doc(db, `users/${userId}/${collectionName}/${id.toString()}`);
+    const docRef = doc(db, `users/${userId}/${collectionName}/${id}`);
     await deleteDoc(docRef);
     message.success(`${title} deleted successfully`);
-    fetchData(userId, collectionName, setLoading, setData)
+    await fetchData(userId, collectionName, setLoading, setData);
   } catch (error) {
-    message.error(error.code);
+    message.error("Error deleting data: " + error.message);
   }
 };
 
 export const create = async (userId, values, title, collectionName) => {
   try {
+    const createdAt = new Date();
+    const formattedDate = formatDate(createdAt);
+
     const collectionRef = collection(db, `users/${userId}/${collectionName}`);
-    const docRef = await addDoc(collectionRef, values);
+    const docValues = { ...values, createdAt: formattedDate };
+    const docRef = await addDoc(collectionRef, docValues);
     const documentId = docRef.id;
     const documentRef = doc(db, `users/${userId}/${collectionName}/${documentId}`);
-    const updatedValues = { ...values, id: documentId, createAt: serverTimestamp()};
+    const updatedValues = { ...values, id: documentId };
     await updateDoc(documentRef, updatedValues);
-    message.success(`${title} Added Successfully`);
   } catch (error) {
-    message.error(error.message);
+    message.error("Error creating data: " + error.message);
+    console.log(error);
   }
 };
