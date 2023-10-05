@@ -16,8 +16,8 @@ function Dashboard() {
       </Row>
       <Col className="flex flex-col pt-8 gap-10 xl:w-[34rem]">
         <CashFlow />
-        <Purchase />
         <Expenses />
+        <Purchase />
       </Col>
     </div>
   );

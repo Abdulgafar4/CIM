@@ -10,6 +10,7 @@ import Suppliers from "../../Pages/people/suppliers";
 import ProductCategories from "../../Pages/products/categories";
 import ProductList from "../../Pages/products";
 import Purchase from "../../Pages/purchases";
+import CreatePurchase from "../../Pages/purchases/components/CreatePurchase";
 import PurchaseReturn from "../../Pages/purchases/purchase_return";
 import Sales from "../../Pages/sales";
 import Dashboard from "../../Pages/Dashbaord";
@@ -122,6 +123,14 @@ function AppRoutes() {
         element={
           <RequireAuth>
             <Purchase />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/purchases/create-purchase"
+        element={
+          <RequireAuth>
+            <CreatePurchase />
           </RequireAuth>
         }
       />

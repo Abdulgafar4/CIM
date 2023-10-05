@@ -1,11 +1,10 @@
 /* eslint-disable react/prop-types */
-import { Table, Button, Space, Popconfirm, Breadcrumb, Tag } from "antd";
-import { CloseCircleOutlined, HomeOutlined } from "@ant-design/icons";
-import CreateButton from "./components/CreateButton";
+import { Table, Button, Space, Popconfirm, Breadcrumb } from "antd";
+import { CloseCircleOutlined, HomeOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import { useContext, useEffect, useState } from "react";
 import EditModal from "./components/EditModal";
 import ViewButton from "./components/ViewModal";
-import { colors } from "../../colors";
+// import { colors } from "../../colors";
 import SearchInput from "../../Components/AppSearch/SearchInput";
 import { AuthContext } from "../../context/AuthContext";
 import { fetchData, handleDelete } from "../../API";
@@ -42,17 +41,17 @@ function Purchases() {
       key: "category",
       responsive: ["lg"],
       width: 100,
-      render: (_, { category }) => (
-        <>
-          {category.map((tag) => {
-            return (
-              <Tag color={colors.green} key={tag}>
-                {tag.toUpperCase()}
-              </Tag>
-            );
-          })}
-        </>
-      ),
+      // render: (_, { category }) => (
+      //   <>
+      //     {category.map((tag) => {
+      //       return (
+      //         <Tag color={colors.green} key={tag}>
+      //           {tag.toUpperCase()}
+      //         </Tag>
+      //       );
+      //     })}
+      //   </>
+      // ),
     },
     {
       title: "Quantity",
@@ -67,17 +66,17 @@ function Purchases() {
       key: "variants",
       responsive: ["xl"],
       width: 200,
-      render: (_, { variants }) => (
-        <>
-          {variants.map((tag) => {
-            return (
-              <Tag color={colors.green} key={tag}>
-                {tag.toUpperCase()}
-              </Tag>
-            );
-          })}
-        </>
-      ),
+      // render: (_, { variants }) => (
+      //   <>
+      //     {variants.map((tag) => {
+      //       return (
+      //         <Tag color={colors.green} key={tag}>
+      //           {tag.toUpperCase()}
+      //         </Tag>
+      //       );
+      //     })}
+      //   </>
+      // ),
     },
     {
       title: "Supplier",
@@ -152,7 +151,14 @@ function Purchases() {
       />
       <div className="flex flex-row justify-between pt-8">
         <SearchInput setSearchKeyword={setSearchKeyword} />
-        <CreateButton setLoading={setLoading} setData={setData} />
+        <Button
+        type="primary"
+        className="bg-green-500 text-white"
+        icon={<PlusCircleOutlined />}
+        href="/purchases/create-purchase"
+      >
+        Create Purchase
+      </Button>
       </div>
       <Table
         dataSource={filteredData}

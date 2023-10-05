@@ -1,13 +1,15 @@
 /* eslint-disable react/prop-types */
 import { useContext, useState } from "react";
-import { Button, Modal, Form, Input, Select, Breadcrumb, message } from "antd";
+import { Button, Modal, Form, Input, Select, Breadcrumb } from "antd";
 import { HomeOutlined, PlusCircleOutlined } from "@ant-design/icons";
-import { AuthContext } from "../../../context/AuthContext";
-import { create, fetchData } from "../../../API";
+import { AuthContext } from "../../../../context/AuthContext";
+import { fetchData } from "../../../../API";
 import { useEffect } from "react";
 import { useRef } from "react";
+import { addToPurchaseCart } from "../../../../redux/purchaseSlice";
+import { useDispatch } from "react-redux";
 
-const CreateButton = ({ setLoading, setData }) => {
+const CreateButton = ({ setLoading }) => {
   const [visible, setVisible] = useState(false);
   const [form] = Form.useForm();
   const { currentUser } = useContext(AuthContext);
@@ -21,6 +23,8 @@ const CreateButton = ({ setLoading, setData }) => {
   };
 
   const userId = currentUser.uid;
+  const dispatch = useDispatch();
+
 
   useEffect(() => {
     fetchData(userId, "productCategory", setLoading, setCatData);
@@ -28,21 +32,36 @@ const CreateButton = ({ setLoading, setData }) => {
     fetchData(userId, "productVariant", setLoading, setVariantData);
   }, [userId, setLoading]);
 
+  // const handleCreate = () => {
+  //   form
+  //     .validateFields()
+  //     .then((values) => {
+  //       create(userId, values, "Purchases", "purchases");
+  //     })
+  //     .then(() => {
+  //       form.resetFields();
+  //       setVisible(false);
+  //       // fetchData(userId, "purchases", setLoading, setData);
+  //     })
+  //     .catch((error) => {
+  //       message.error(error.code);
+  //     });
+  // };
+
   const handleCreate = () => {
-    form
-      .validateFields()
+    setLoading(true)
+    form.validateFields()
       .then((values) => {
-        create(userId, values, "Purchases", "purchases");
-      })
+      dispatch(addToPurchaseCart(values))}
+      )
       .then(() => {
         form.resetFields();
         setVisible(false);
-        fetchData(userId, "purchases", setLoading, setData);
+        
       })
-      .catch((error) => {
-        message.error(error.code);
-      });
-  };
+      setLoading(false)
+    
+  }
 
   const handleCancel = () => {
     form.resetFields();
@@ -84,6 +103,15 @@ const CreateButton = ({ setLoading, setData }) => {
         okText="Save"
       >
         <Form form={form} className="pt-5">
+        <Form.Item
+            name="id"
+            label="ID"
+            rules={[
+              { required: true, message: "ID can not be empty" },
+            ]}
+          >
+            <Input />
+          </Form.Item>
           <Form.Item
             name="code"
             label="Product Code"
@@ -107,7 +135,7 @@ const CreateButton = ({ setLoading, setData }) => {
             label="Cost"
             rules={[{ required: true, message: "Enter a Price" }]}
           >
-           <Input onClick={() => {
+            <Input onClick={() => {
               inputRef.current.focus({
                 cursor: 'start',
               });
@@ -153,7 +181,7 @@ const CreateButton = ({ setLoading, setData }) => {
             label="Supplier"
             rules={[{ required: true, message: "Supplier can not be empty" }]}
           >
-              <Select
+            <Select
               mode="tags"
               style={{
                 width: "100%",
@@ -184,7 +212,7 @@ const CreateButton = ({ setLoading, setData }) => {
               });
             }} {...sharedProps} />
           </Form.Item>
-          <Form.Item
+          {/* <Form.Item
             name="subtotal"
             label="SubTotal"
             rules={[{ required: true, message: "Enter a Price" }]}
@@ -194,7 +222,7 @@ const CreateButton = ({ setLoading, setData }) => {
                 cursor: 'start',
               });
             }} {...sharedProps} />
-          </Form.Item>
+          </Form.Item> */}
           <Form.Item
             name="paymentstatus"
             label="Payment Status"

@@ -1,4 +1,5 @@
-import { BsBoxArrowLeft, BsBoxArrowRight, BsMinecartLoaded } from "react-icons/bs";
+import { BsBoxArrowLeft, BsMinecartLoaded } from "react-icons/bs";
+import { GiPayMoney } from "react-icons/gi";
 import { MdOutlineSell } from "react-icons/md";
 
 
@@ -8,6 +9,12 @@ export const detailCardData = [
         desc: "Total Sales",
         amount: "10,000",
         icon: <MdOutlineSell size={20}/>
+    },
+    {
+        title: "Expenses",
+        desc: "Total Sales Amount",
+        amount: "10,000",
+        icon: <GiPayMoney size={20} />
     },
     {
         title: "Purchase",
@@ -20,11 +27,5 @@ export const detailCardData = [
         desc: "Total Sales Return",
         amount: "10,000",
         icon: <BsBoxArrowLeft size={20}/>
-    },
-    {
-        title: "P-Return",
-        desc: "Total Sales Amount",
-        amount: "10,000",
-        icon: <BsBoxArrowRight size={20}/>
     },
 ]

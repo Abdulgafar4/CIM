@@ -33,7 +33,10 @@ function getItem(label, key, icon, children) {
       getItem('Sales', '/sales'),
       getItem('POS', '/sales/pos'),
     ]),
-    getItem('Purchase', '/purchases', <BsMinecartLoaded />),
+    getItem('Purchase', 'sub2', <BsMinecartLoaded />, [
+      getItem('Purchase List', '/purchases'),
+      getItem('Create Purchase', '/purchases/create-purchase'),
+    ]),
     getItem('Expenses', '/expenses', <GiPayMoney />),
     getItem('People', 'sub3', <BsPeople />, [
       getItem("Customers", "/customers"),
