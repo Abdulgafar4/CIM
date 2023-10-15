@@ -12,17 +12,13 @@ const EditModal = ({ record, setLoading, setData }) => {
   const [form] = Form.useForm();
   const [visible, setVisible] = useState(false);
   const { currentUser } = useContext(AuthContext);
-  const [catData, setCatData] = useState([]);
-  const [variantData, setVariantData] = useState([]);
   const [supplier, setSupplier] = useState([]);
 
 
   const userId = currentUser.uid;
 
   useEffect(() => {
-    fetchData(userId, "productCategory", setLoading, setCatData);
     fetchData(userId, "suppliers", setLoading, setSupplier);
-    fetchData(userId, "productVariant", setLoading, setVariantData);
   }, [userId, setLoading]);
 
 
@@ -81,66 +77,6 @@ const EditModal = ({ record, setLoading, setData }) => {
             rules={[{ required: true, message: 'ID can not be empty' }]}
           >
             <Input disabled />
-          </Form.Item>
-        <Form.Item
-            name="code"
-            label="Product Code"
-            rules={[
-              { required: true, message: "Product Code can not be empty" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="name"
-            label="Product Name"
-            rules={[
-              { required: true, message: "Product name can not be empty" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="cost"
-            label="Cost"
-            rules={[{ required: true, message: "Enter a Price" }]}
-          >
-           <Input />
-          </Form.Item>
-          <Form.Item
-            name="category"
-            label="Category"
-            rules={[{ required: true, message: "Category can not be empty" }]}
-          >
-            <Select
-              mode="tags"
-              style={{
-                width: "100%",
-              }}
-              placeholder="Select the Product Category"
-              options={catData}
-            />
-          </Form.Item>
-          <Form.Item
-            name="quantity"
-            label="Quantity"
-            rules={[{ required: true, message: "Quantity can not be empty" }]}
-          >
-            <Input type="number" />
-          </Form.Item>
-          <Form.Item
-            name="variants"
-            label="Variants"
-            rules={[{ required: true, message: "Variants can not be empty" }]}
-          >
-            <Select
-              mode="tags"
-              style={{
-                width: "100%",
-              }}
-              placeholder="Select the Variants"
-              options={variantData}
-            />
           </Form.Item>
           <Form.Item
             name="supplier"

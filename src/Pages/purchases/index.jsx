@@ -1,10 +1,10 @@
 /* eslint-disable react/prop-types */
-import { Table, Button, Space, Popconfirm, Breadcrumb } from "antd";
+import { Table, Button, Space, Popconfirm, Breadcrumb, Tag } from "antd";
 import { CloseCircleOutlined, HomeOutlined, PlusCircleOutlined } from "@ant-design/icons";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import EditModal from "./components/EditModal";
 import ViewButton from "./components/ViewModal";
-// import { colors } from "../../colors";
+import { colors } from "../../colors";
 import SearchInput from "../../Components/AppSearch/SearchInput";
 import { AuthContext } from "../../context/AuthContext";
 import { fetchData, handleDelete } from "../../API";
@@ -16,73 +16,54 @@ function Purchases() {
   const { currentUser } = useContext(AuthContext);
   const userId = currentUser.uid;
 
+  const effectRan = useRef(false)
+
   useEffect(() => {
-    fetchData(userId, "purchases", setLoading, setData);
+    if (effectRan.current === true){
+      fetchData(userId, "purchases", setLoading, setData);
+    }
+    return () => {
+      effectRan.current = true
+    }
   }, [userId]);
 
+
   const columns = [
+    { title: "ID", dataIndex: "id", key: "id"},
     {
       title: "Date Added",
       dataIndex: "createdAt",
       key: "date",
       responsive: ["sm"]
     },
-    { title: "Code", dataIndex: "code", key: "code"},
-    { title: "Name", dataIndex: "name", key: "name", responsive: ["sm"] },
+    { title: "Supplier", dataIndex: "supplier", key: "supplier", responsive: ["md"] },
     {
-      title: "(₦) Cost",
-      dataIndex: "cost",
-      key: "cost",
+      title: "Discount",
+      dataIndex: "discount",
+      key: "discount",
       responsive: ["md"],
     },
     {
-      title: "Category",
-      dataIndex: "category",
-      key: "category",
+      title: "Tax",
+      dataIndex: "tax",
+      key: "tax",
       responsive: ["lg"],
       width: 100,
-      // render: (_, { category }) => (
-      //   <>
-      //     {category.map((tag) => {
-      //       return (
-      //         <Tag color={colors.green} key={tag}>
-      //           {tag.toUpperCase()}
-      //         </Tag>
-      //       );
-      //     })}
-      //   </>
-      // ),
     },
+    { title: "Sub Total", dataIndex: "subtotal", key: "subtotal", responsive: ["sm"] },
     {
-      title: "Quantity",
-      dataIndex: "quantity",
-      key: "quantity",
-      responsive: ["lg"],
+      title: "Payment Status",
+      dataIndex: "paymentStatus",
+      key: "paymentStatus",
+      responsive: ["xl"],
+      render: (_, { paymentstatus }) => (
+        <>
+              <Tag color={colors.green}>
+                {paymentstatus}
+              </Tag>
 
-    },
-    {
-      title: "Variants",
-      dataIndex: "variants",
-      key: "variants",
-      responsive: ["xl"],
-      width: 200,
-      // render: (_, { variants }) => (
-      //   <>
-      //     {variants.map((tag) => {
-      //       return (
-      //         <Tag color={colors.green} key={tag}>
-      //           {tag.toUpperCase()}
-      //         </Tag>
-      //       );
-      //     })}
-      //   </>
-      // ),
-    },
-    {
-      title: "Supplier",
-      dataIndex: "supplier",
-      key: "supplier",
-      responsive: ["xl"],
+        </>
+      ),
     },
     {
       title: "Actions",

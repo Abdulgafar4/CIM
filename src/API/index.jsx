@@ -33,7 +33,7 @@ export const handleDelete = async (id, userId, title, collectionName, setLoading
   try {
     const docRef = doc(db, `users/${userId}/${collectionName}/${id}`);
     await deleteDoc(docRef);
-    message.success(`${title} deleted successfully`);
+    message.success(`${title} with the ID ${id} deleted successfully`);
     await fetchData(userId, collectionName, setLoading, setData);
   } catch (error) {
     message.error("Error deleting data: " + error.message);

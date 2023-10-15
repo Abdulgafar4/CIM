@@ -35,7 +35,6 @@ const GenerateInvoiceBtn = ({ subTotal, record }) => {
   const dispatch = useDispatch();
 
 
-
   const handleCreate = () => {
     form.validateFields().then((values) => {
       create(userId, { ...values, subTotal, cartItems }, "Bill", "bill")
@@ -106,7 +105,6 @@ const GenerateInvoiceBtn = ({ subTotal, record }) => {
               placeholder="Cashier"
               options={cashierData}
               loading={loading}
-              defaultValue="Manager"
 
             />
           </Form.Item>
@@ -124,7 +122,6 @@ const GenerateInvoiceBtn = ({ subTotal, record }) => {
               placeholder="Walk In Customer"
               options={customerData}
               loading={loading}
-              defaultValue="Walk In Customer"
             />
           </Form.Item>
           <Form.Item

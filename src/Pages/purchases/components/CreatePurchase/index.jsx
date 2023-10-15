@@ -1,25 +1,16 @@
 /* eslint-disable react/prop-types */
 import { Table, Button, Space, Popconfirm, Breadcrumb, Tag } from "antd";
 import { CloseCircleOutlined, HomeOutlined } from "@ant-design/icons";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { colors } from "../../../../colors";
-// import { AuthContext } from "../../../../context/AuthContext";
 import CreateButton from "./CreateButton";
 import { useDispatch, useSelector } from "react-redux";
 import { clearPurchaseCart, removeFromPurchaseCart } from "../../../../redux/purchaseSlice";
-import { create } from "../../../../API";
-import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../../../context/AuthContext";
-import { clearCart } from "../../../../redux/cartSlice";
+import PurchaseModal from "./PurchaseModal";
 
 function CreatePurchase() {
   const [loading, setLoading] = useState(false);
-  const { currentUser } = useContext(AuthContext);
-  const userId = currentUser.uid;
   const [subTotal, setSubTotal] = useState(0);
-  const navigate = useNavigate();
-
-
 
 
   const { purchaseCartItems } = useSelector((store) => store.purchaseCart);
@@ -28,24 +19,16 @@ function CreatePurchase() {
     let temp = 0;
     purchaseCartItems.forEach((item) => (temp += item.cost * item.quantity));
     setSubTotal(temp);
-  },[purchaseCartItems]);
+  }, [purchaseCartItems]);
 
   useEffect(() => {
     calculateSubTotal();
-  }, [ calculateSubTotal]);
+  }, [calculateSubTotal]);
 
-
-    const handleCreate = (record) => {
-
-      create(userId, {purchaseCartItems, subTotal}, "Purchases", "purchases");
-      navigate("/purchases");
-      dispatch(clearCart(record));
-
-  };
 
   const columns = [
-    { title: "ID", dataIndex: "id", key: "id"},
-    { title: "Code", dataIndex: "code", key: "code"},
+    { title: "ID", dataIndex: "id", key: "id" },
+    { title: "Code", dataIndex: "code", key: "code" },
     { title: "Name", dataIndex: "name", key: "name", responsive: ["sm"] },
     {
       title: "(₦) Cost",
@@ -97,12 +80,6 @@ function CreatePurchase() {
       ),
     },
     {
-      title: "Supplier",
-      dataIndex: "supplier",
-      key: "supplier",
-      responsive: ["xl"],
-    },
-    {
       title: "Actions",
       dataIndex: "actions",
       key: "actions",
@@ -128,12 +105,7 @@ function CreatePurchase() {
       <div className="flex gap-2 justify-end items-end">
         <div className="flex flex-col gap-2">
           <h1 className="font-light text-lg">Total Amount: ₦{subTotal}</h1>
-          <Button 
-                 type="primary"
-                 className="bg-green-500 text-white"
-          onClick={handleCreate(record)}>
-          Add to Purchase
-        </Button>
+          <PurchaseModal record={record} setLoading={setLoading} />
         </div>
         <Button danger onClick={() => dispatch(clearPurchaseCart(record))}>
           Reset
@@ -142,8 +114,6 @@ function CreatePurchase() {
     );
   };
 
-
-  //update cart handler
   return (
     <div>
       <Breadcrumb

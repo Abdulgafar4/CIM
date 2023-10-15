@@ -43,7 +43,7 @@ const purchaseCartSlice = createSlice({
         return state;
       });
     },
-    clearCart(state) {
+    clearPurchaseCart(state) {
       state.purchaseCartItems = [];
       localStorage.setItem("purchaseCartItems", JSON.stringify(state.purchaseCartItems));
     },

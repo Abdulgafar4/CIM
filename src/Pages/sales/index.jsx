@@ -1,12 +1,12 @@
 /* eslint-disable react/prop-types */
-import { Table, Space, Breadcrumb, Tag } from "antd";
-import {  HomeOutlined } from "@ant-design/icons";
+import { Table, Space, Breadcrumb, Tag, Popconfirm, Button } from "antd";
+import {  CloseCircleOutlined, HomeOutlined } from "@ant-design/icons";
 import { useContext, useEffect, useState } from "react";
 import ViewButton from "./components/viewModal";
 import { colors } from "../../colors";
 import SearchInput from "../../Components/AppSearch/SearchInput";
 import { AuthContext } from "../../context/AuthContext";
-import { fetchData } from "../../API";
+import { fetchData, handleDelete } from "../../API";
 
 function Sales() {
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -19,6 +19,7 @@ function Sales() {
     fetchData(userId, "bill", setLoading, setData);
   }, [userId]);
 
+  
 
   const columns = [
     { title: "ID", dataIndex: "id", key: "id" },
@@ -59,6 +60,24 @@ function Sales() {
       render: (_, record) => (
         <Space size="small">
           <ViewButton record={record} />
+          <Popconfirm
+            title="Are you sure you want to delete this record?"
+            onConfirm={() =>
+              handleDelete(
+                record.id,
+                userId,
+                "Sale",
+                "bill",
+                setLoading,
+                setData
+              )
+            }
+            okText="Yes"
+            cancelText="No"
+            okType="default"
+          >
+            <Button danger icon={<CloseCircleOutlined />} />
+          </Popconfirm>
         </Space>
       ),
     },
