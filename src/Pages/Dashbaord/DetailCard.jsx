@@ -1,51 +1,45 @@
 import { Card, Col, Row } from "antd";
-import { detailCardData } from "./mock/MockData";
-import { useContext } from "react";
-import { useState } from "react";
-import { useEffect } from "react";
+import { detailCardData, getCurrentMonthTotalAmount, getMonthlyTotals, getYearlyTotal } from "./mock/MockData";
+import { useContext, useState, useEffect } from "react";
 import { fetchData } from "../../API";
 import { AuthContext } from "../../context/AuthContext";
 
 
 function DetailCard() {
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState([]);
+  const [salesData, setData] = useState([]);
   const [expensesData, setExpensesData] = useState([]);
+  const [purchasesData, setPurchasesData] = useState([]);
   const { currentUser } = useContext(AuthContext);
   const userId = currentUser.uid;
 
   useEffect(() => {
     fetchData(userId, "bill", setLoading, setData);
     fetchData(userId, "expenses", setLoading, setExpensesData);
+    fetchData(userId, "purchases", setLoading, setPurchasesData);
   }, [userId]);
 
-  {loading && console.log("loading");}
+  { loading && console.log("loading"); }
 
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1; // 0 indexed
+  const salesAmount = getCurrentMonthTotalAmount(salesData);
+  const expensesAmount = getCurrentMonthTotalAmount(expensesData);
+  const purchasesAmount = getCurrentMonthTotalAmount(purchasesData);
+  const monthlySales = getMonthlyTotals(salesData);
+  const monthlyExpenses = getMonthlyTotals(expensesData);
+  const monthlyPurchases = getMonthlyTotals(purchasesData);
+  const yearlySales = getYearlyTotal(monthlySales)
+  const yearlyExpenses = getYearlyTotal(monthlyExpenses)
+  const yearlyPurchases = getYearlyTotal(monthlyPurchases)
 
-  // Filter for current year and month
-  const currentData = data.filter(item => {
-    const itemDate = new Date(item.createdAt);
+  const cashflow = yearlySales + yearlyExpenses + yearlyPurchases;
 
-    return itemDate.getFullYear() === currentYear &&
-      itemDate.getMonth() + 1 === currentMonth;
-  });
-  const currentExpensesData = expensesData.filter(item => {
-    const itemDate = new Date(item.createdAt);
+  function getAmount(data) {
+    if (data.title === "Sales") return salesAmount;
+    if (data.title === "Expenses") return expensesAmount;
+    if (data.title === "Purchases") return purchasesAmount;
 
-    return itemDate.getFullYear() === currentYear &&
-      itemDate.getMonth() + 1 === currentMonth;
-  });
-  // Calculate total
-  const currentMonthTotalAmount = currentData.reduce((acc, item) => {
-    return acc + item.subTotal;
-  }, 0);
-
-  const expensesCurrentMonthTotalAmount = currentExpensesData.reduce((acc, item) => {
-    return acc + Number(item.amount);
-  }, 0);
+    return cashflow;
+  }
 
   return (
     <Row className="flex flex-row gap-10 justify-center pt-8">
@@ -58,7 +52,7 @@ function DetailCard() {
               </div>
               <div>
                 <p className="pb-2 text-base text-gray-500">{data.title}</p>
-                <p className="text-green-600">₦ {data.title === "Sales" ? currentMonthTotalAmount : data.title === "Expenses" ? expensesCurrentMonthTotalAmount : data.amount}</p>
+                <p className="text-green-600">₦ {getAmount(data)}</p>
               </div>
 
             </div>

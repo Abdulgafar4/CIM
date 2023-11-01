@@ -11,6 +11,10 @@ import {
   Legend,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import { useContext, useState, useEffect } from "react";
+import { fetchData } from "../../API";
+import { AuthContext } from "../../context/AuthContext";
+import { getMonthlyTotals } from "./mock/MockData";
 
 ChartJS.register(
   CategoryScale,
@@ -23,6 +27,18 @@ ChartJS.register(
 );
 
 function CashFlow() {
+  const [loading, setLoading] = useState(false);
+  const [salesData, setData] = useState([]);
+  const [expensesData, setExpensesData] = useState([]);
+  const { currentUser } = useContext(AuthContext);
+  const userId = currentUser.uid;
+
+  useEffect(() => {
+    fetchData(userId, "bill", setLoading, setData);
+    fetchData(userId, "expenses", setLoading, setExpensesData);
+  }, [userId]);
+
+  { loading && console.log("loading"); }
    const options = {
     // responsive: true,
     plugins: {
@@ -50,21 +66,22 @@ function CashFlow() {
     }
   };
   
-  const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+  const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
   
   const data = {
     labels,
     datasets: [
       {
         label: "Income",
-        data: [2000, 2001, 3002, 3003, 4004, 4005, 5006, 5007],
+        data: getMonthlyTotals(salesData),
         borderColor: colors.green,
         backgroundColor: colors.green,
         tension: 0.5
       },
       {
         label: "Expenses",
-        data: [2001, 2002, 3003, 3004, 4005, 5006, 6006, 7007],
+        data: getMonthlyTotals(expensesData),
         backgroundColor: 'rgb(53, 162, 235)',
         borderColor: 'rgb(53, 162, 235)',
         tension: 0.5

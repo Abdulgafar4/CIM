@@ -1,17 +1,23 @@
 import { Card, Col, Table, Tag } from "antd"
 import { colors } from "../../colors"
+import { AuthContext } from "../../context/AuthContext";
+import { fetchData } from "../../API";
+import { useEffect, useState, useContext } from "react";
 
-function RecentSales() {
+function RecentPurchases() {
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState([]);
+  const { currentUser } = useContext(AuthContext);
+  const userId = currentUser.uid;
+
+  useEffect(() => {
+    fetchData(userId, "purchases", setLoading, setData);
+  }, [userId]);
+
   const columns = [
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-      render: (text) => <a href="/purchase">{text}</a>,
-    },
-    {
       title: 'Date',
-      dataIndex: 'date',
+      dataIndex: 'createdAt',
       key: 'date',
       responsive: ['sm'],
     },
@@ -23,53 +29,25 @@ function RecentSales() {
     },
     {
       title: 'Payment Status',
-      dataIndex: 'status',
+      dataIndex: 'paymentstatus',
       key: 'status',
-      render: (_, { status }) => (
+      render: (_, { paymentstatus }) => (
         <>
-          {status.map((tag) => {
-            let color = tag === 'UnPaid' ? 'red' : tag === 'Paid' ? 'green' : 'yellow';
-            return (
-              <Tag color={color} key={tag}>
-                {tag.toUpperCase()}
-              </Tag>
-            );
-          })}
+          <Tag color={paymentstatus === 'UnPaid' ? 'red' : paymentstatus === 'Paid' ? 'green' : 'yellow'}>
+            {paymentstatus}
+          </Tag>
         </>
       ),
     },
   ];
 
-  const data = [
-    {
-      key: '1',
-      name: 'John Brown',
-      date: '23-08-2020',
-      supplier: 'John Doe',
-      status: ['Paid']
-    },
-    {
-      key: '2',
-      name: 'John Brown',
-      date: '23-08-2020',
-      supplier: 'John Doe',
-      status: ['UnPaid']
-    },
-    {
-      key: '3',
-      name: 'John Brown',
-      date: '23-08-2020',
-      supplier: 'John Doe',
-      status: ['Partial']
-    },
-  ];
   return (
     <Col className="">
-     <Card title="Recent Purchase" headStyle={{borderLeftColor: colors.green, borderLeftWidth: "3px", color: colors.green }}>
-      <Table bordered pagination={false} columns={columns} dataSource={data.slice(0,5)} />
-     </Card>
+      <Card title="Recent Purchase" headStyle={{ borderLeftColor: colors.green, borderLeftWidth: "3px", color: colors.green }}>
+        <Table bordered pagination={false} columns={columns} dataSource={data.slice(0, 5)} loading={loading} />
+      </Card>
     </Col>
   )
 }
 
-export default RecentSales
+export default RecentPurchases

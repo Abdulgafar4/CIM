@@ -126,7 +126,7 @@ function PurchaseModal( record,{setLoading }) {
                         }} {...sharedProps} />
                     </Form.Item>
                     <Form.Item
-                        name="subtotal"
+                        name="subTotal"
                         label="SubTotal"
                         rules={[{ required: true, message: "Enter a Price" }]}
                     >

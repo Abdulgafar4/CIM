@@ -2,11 +2,9 @@ import { Card, Col, Table, Tag } from "antd"
 import { colors } from "../../colors"
 import { AuthContext } from "../../context/AuthContext";
 import { fetchData } from "../../API";
-import { useEffect } from "react";
-import { useContext } from "react";
-import { useState } from "react";
+import { useEffect, useState, useContext } from "react";
 
-function Attendance() {
+function Sales() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const { currentUser } = useContext(AuthContext);
@@ -56,4 +54,4 @@ function Attendance() {
   )
 }
 
-export default Attendance
+export default Sales

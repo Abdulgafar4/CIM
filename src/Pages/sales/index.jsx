@@ -19,6 +19,8 @@ function Sales() {
     fetchData(userId, "bill", setLoading, setData);
   }, [userId]);
 
+  console.log(data)
+
   
 
   const columns = [

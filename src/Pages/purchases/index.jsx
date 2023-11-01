@@ -50,7 +50,7 @@ function Purchases() {
       responsive: ["lg"],
       width: 100,
     },
-    { title: "Sub Total", dataIndex: "subtotal", key: "subtotal", responsive: ["sm"] },
+    { title: "Sub Total", dataIndex: "subTotal", key: "subtotal", responsive: ["sm"] },
     {
       title: "Payment Status",
       dataIndex: "paymentStatus",
